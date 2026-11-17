@@ -1,0 +1,64 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Accessibility" />
+
+# Accessibility
+
+Accessibility is part of the component contract, not a checklist added at the end. Every
+component in this library is keyboard reachable, announces its state, and keeps contrast
+above WCAG AA for text and controls in both themes.
+
+## What the components guarantee
+
+| Area             | Behaviour                                                                                                                                             |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Focus**        | Every interactive element uses a visible 2px `--sg-ring` ring with a background offset. Focus is never removed without a replacement.                 |
+| **Labels**       | Icon-only buttons require an `aria-label` in the component API. Form fields have a `Label` component linked by `for`/`id`; switches link their label. |
+| **Colour**       | Status is always spelled out. `CommunicationBadge` says “Missed call”; `DeviceStatusBadge` says “Do not disturb”. The dot and tone are reinforcement. |
+| **Live updates** | `ConnectionStatus` is a polite live region. `SmsThread` is a `role="log"` with `aria-live="polite"` and `aria-relevant="additions"`.                  |
+| **Time**         | The visible call clock updates every second, but the screen-reader label is a stable sentence (“1 min 5 sec”), not a stream of numbers.               |
+| **Motion**       | Animations are short and never required to understand state. Shimmer and pulse stop under `prefers-reduced-motion`.                                   |
+| **Targets**      | Buttons are 32–44px, list rows 44px+, and the voicemail scrubber has a full-height invisible range input.                                             |
+
+## Keyboard map
+
+| Component                             | Keys                                                                 |
+| ------------------------------------- | -------------------------------------------------------------------- |
+| `Dialog`                              | `Tab` cycles inside, `Escape` closes, focus returns to the trigger   |
+| `Tabs`                                | `←` / `→` moves between tabs, `Home` / `End` jump to the edges       |
+| `Tooltip`                             | Opens on focus and hover, closes with `Escape`                       |
+| `Switch`                              | `Space` toggles, the label is clickable                              |
+| `SmsComposer`                         | `Ctrl/⌘ + Enter` sends; plain `Enter` keeps a newline                |
+| `VoicemailPlayer`                     | The scrubber is a native range input: arrows seek, `Home`/`End` jump |
+| `CallHistoryList` / `ContactListItem` | The row is one button; hover actions are separate buttons outside it |
+
+## Screen-reader notes
+
+- `CommunicationIcon` exposes a single label such as “Incoming call”. The decorative SVG is hidden.
+- `ActiveCallCard` labels the live region and announces status changes (“Incoming call”, “On hold”) without interrupting the timer.
+- `SmsBubble` includes delivery state as text (“Sent”, “Delivered”, “Failed”) for outbound messages.
+- `EmptyState` is a heading followed by explanatory copy, so it is navigable by heading.
+- `PhoneNumber` renders a `tel:` link with an accessible name such as “Call +49 30 1234 5678”; the copy action has its own label.
+
+## Contrast
+
+The palette is tested against the surfaces it is used on:
+
+- primary/foreground pairs: AA for normal text
+- muted text: AA on background and surface
+- lime: used as a fill with `#202023` text, never as text on paper
+- borders: not used as the only signal for state
+
+If you override tokens, check your pairs. The `@storybook/addon-a11y` panel runs axe on every
+story — open it when changing colours.
+
+## Testing
+
+```bash
+pnpm test        # unit tests for formatting, SMS segmentation and key components
+pnpm typecheck   # template and prop types
+pnpm dev         # Storybook with the Accessibility panel enabled
+```
+
+The most useful manual pass is: tab through the entire cockpit example, open a dialog, close
+it with `Escape`, send an SMS with the keyboard, and scrub the voicemail with arrow keys.

@@ -1,0 +1,165 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Theming" />
+
+# Theming
+
+The library ships a complete theme, but every value is a CSS custom property. You can
+re-skin it per application — or per subtree — without rebuilding the package.
+
+## How the layers fit together
+
+1. **Raw tokens** — `--sg-primary`, `--sg-surface`, `--sg-radius`, `--sg-font-sans`, …
+   They are declared on `:root` and can be overridden on `.sg-root` or any subtree.
+2. **Tailwind mapping** — `@theme inline` maps them to namespaced utilities such as
+   `bg-sg-primary`, `text-sg-muted-foreground`, `rounded-sg-lg`, `shadow-sg-md`.
+3. **Components** — only use the mapped utilities. They never hard-code brand colours.
+
+Because every token is prefixed with `sg`, the library can load next to an existing shadcn
+theme that already defines `--primary`, `--background` and `--ring`. Nothing collides.
+
+The published CSS does **not** include Tailwind's theme layer. Generic scale values — spacing,
+text sizes, container widths, breakpoints — are inlined into the utilities, and `color-scheme`
+is scoped to `.sg-root`. The host application keeps its own `--font-sans`, `--spacing` and
+custom theme variables even if the library stylesheet loads last.
+
+## Core palette
+
+<div className="sg-doc-grid">
+  <div className="sg-doc-card">
+    <div className="sg-doc-swatch" style={{ background: 'var(--sg-primary)' }} />
+    <h3 style={{ marginTop: '0.7rem' }}>Primary violet</h3>
+    <p className="sg-doc-mono">--sg-primary · #8642fe</p>
+  </div>
+  <div className="sg-doc-card">
+    <div className="sg-doc-swatch" style={{ background: 'var(--sg-accent)' }} />
+    <h3 style={{ marginTop: '0.7rem' }}>Live lime</h3>
+    <p className="sg-doc-mono">--sg-accent · #deff00</p>
+  </div>
+  <div className="sg-doc-card">
+    <div className="sg-doc-swatch" style={{ background: 'var(--sg-surface-inverse)' }} />
+    <h3 style={{ marginTop: '0.7rem' }}>Ink</h3>
+    <p className="sg-doc-mono">--sg-surface-inverse · #202023</p>
+  </div>
+  <div className="sg-doc-card">
+    <div className="sg-doc-swatch" style={{ background: 'var(--sg-background)' }} />
+    <h3 style={{ marginTop: '0.7rem' }}>Warm paper</h3>
+    <p className="sg-doc-mono">--sg-background · #faf9f6</p>
+  </div>
+</div>
+
+Lime is a signal, not a decoration: it marks live audio, answer actions, recording and
+unread accents. Violet carries normal interaction. Text sizes and spacing follow a compact
+8-point rhythm so dense telephony screens stay readable.
+
+## Override a theme
+
+```css
+/* app.css — loaded after the library stylesheet */
+.sg-root {
+  --sg-primary: #0f766e;
+  --sg-primary-hover: #115e59;
+  --sg-primary-soft: #ccfbf1;
+  --sg-radius: 0.25rem;
+  --sg-radius-lg: 0.375rem;
+  --sg-radius-xl: 0.5rem;
+}
+```
+
+A tighter radius and a teal primary turn the same components into a more utilitarian,
+operator-style product. Overrides are plain CSS, so they work with any build setup.
+
+## Dark mode
+
+Dark mode is a token set, not a filter. Apply the class anywhere above the components:
+
+```html
+<html class="sg-dark">
+  <body>
+    <div class="sg-root"><!-- dark components --></div>
+  </body>
+</html>
+```
+
+`[data-sg-theme="dark"]` is also supported when you prefer attributes. Both toggle
+`color-scheme`, adjust every surface/border token and keep AA contrast for text and controls.
+The dark class belongs on `<html>` (or any ancestor); `.sg-root` inherits the active token set
+instead of forcing light values.
+
+Here is the dark palette in brief:
+
+| Token             | Dark value | Used for        |
+| ----------------- | ---------- | --------------- |
+| `--sg-background` | `#141118`  | page            |
+| `--sg-surface`    | `#1c1823`  | cards, inputs   |
+| `--sg-border`     | `#332b3e`  | hairlines       |
+| `--sg-foreground` | `#f5f2f8`  | primary text    |
+| `--sg-primary`    | `#a57bff`  | actions on dark |
+| `--sg-accent`     | `#deff00`  | live signals    |
+
+## Typography
+
+The default stacks are intentionally not bundled, so you stay in control of loading and
+licensing. Storybook loads three variable fonts from Fontsource:
+
+```bash
+pnpm add @fontsource-variable/instrument-sans \
+         @fontsource-variable/bricolage-grotesque \
+         @fontsource-variable/jetbrains-mono
+```
+
+```ts
+import '@fontsource-variable/instrument-sans';
+import '@fontsource-variable/bricolage-grotesque';
+import '@fontsource-variable/jetbrains-mono';
+```
+
+- **Instrument Sans** — UI text. Clear at 12–14px, unremarkable in the best way.
+- **Bricolage Grotesque** — page titles and card titles. Gives the product an editorial voice.
+- **JetBrains Mono** — phone numbers, durations, counts and IDs. Tabular figures keep columns still while a call timer ticks.
+
+If you skip the imports, the stack falls back to system UI fonts and the layout still holds.
+
+## Coexisting with shadcn
+
+Most sipgate apps are already shadcn projects. The library does not ship Tailwind
+preflight and does not define generic tokens, so it can sit beside your theme:
+
+```css
+/* Optional: borrow your app's brand for the library */
+.sg-root {
+  --sg-primary: var(--primary);
+  --sg-primary-foreground: var(--primary-foreground);
+  --sg-ring: var(--ring);
+  --sg-border: var(--border);
+}
+```
+
+The compiled `style.css` contains only the utilities the components use, prefixed classes and
+the scoped reset. Add `.sg-root` to a wrapper (or to `<body>` if the entire app is sipgate
+branded). Dialogs and tooltips render in a portal with their own `.sg-root` class, so they
+keep typography and the reset.
+
+## The reset, precisely
+
+Inside `.sg-root` only:
+
+- `box-sizing: border-box` on the subtree
+- `border-width: 0; border-style: solid; border-color: var(--sg-border)` on the subtree
+- system font smoothing, text rendering and selection colours
+- form controls inherit font, colour and letter-spacing
+- buttons get a transparent background
+
+No margins, no heading sizes, no global `body` styles. Your application keeps its layout.
+
+## Tokens reference
+
+| Category | Tokens                                                                                                               |
+| -------- | -------------------------------------------------------------------------------------------------------------------- |
+| Surfaces | `background` · `surface` · `surface-muted` · `surface-inverse` · `inverse-foreground`                                |
+| Text     | `foreground` · `muted-foreground` · `subtle-foreground`                                                              |
+| Lines    | `border` · `border-strong` · `input`                                                                                 |
+| Brand    | `primary` · `primary-hover` · `primary-soft` · `primary-foreground` · `accent` · `accent-soft` · `accent-foreground` |
+| Signals  | `success` · `success-soft` · `warning` · `warning-soft` · `danger` · `danger-soft` · `info` · `info-soft`            |
+| Shape    | `radius-sm` · `radius` · `radius-lg` · `radius-xl`                                                                   |
+| Type     | `font-sans` · `font-display` · `font-mono`                                                                           |

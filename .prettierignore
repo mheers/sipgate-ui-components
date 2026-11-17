@@ -1,0 +1,7 @@
+dist/
+storybook-static/
+node_modules/
+pnpm-lock.yaml
+docs/*.png
+public/*.mp3
+coverage/

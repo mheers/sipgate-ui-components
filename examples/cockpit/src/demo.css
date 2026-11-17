@@ -1,0 +1,8 @@
+/*
+ * The example consumes the library source through the package alias. Add the
+ * source directory explicitly so Tailwind sees the classes inside the
+ * components, even though the Vite root is this example folder.
+ */
+@import '../../../src/styles/index.css';
+
+@source '../../../src';

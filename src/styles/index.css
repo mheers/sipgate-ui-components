@@ -1,0 +1,364 @@
+/*
+ * sipgate-ui-components — design tokens and compiled utilities.
+ *
+ * Everything is namespaced with `sg` so the library can live next to an
+ * existing shadcn/Tailwind theme without fighting over `--primary` or
+ * `--background`. Tokens are emitted on :root (so teleported overlays work)
+ * and can be overridden per subtree with `.sg-root` / `.sg-dark`.
+ */
+
+@layer base, components, utilities;
+
+/*
+ * Only the utilities are imported. Tailwind's theme layer is deliberately not
+ * shipped: its :root defaults would override the host application's theme.
+ * The handful of generic variables the generated utilities need are declared
+ * inside `.sg-root` below instead.
+ */
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+/*
+ * The layer order is declared before the imports so the scoped base reset
+ * below can never override utilities. Without it, `@layer base` sorts after
+ * `utilities` and every `bg-sg-*` on a button loses to `background: transparent`.
+ */
+
+@custom-variant sg-dark (&:where(.sg-dark, .sg-dark *, [data-sg-theme='dark'], [data-sg-theme='dark'] *));
+
+:root {
+  /* ---- Surfaces ------------------------------------------------------- */
+  --sg-background: #faf9f6;
+  --sg-surface: #ffffff;
+  --sg-surface-muted: #f2eefb;
+  --sg-surface-inverse: #202023;
+  --sg-inverse-foreground: #f7f5fa;
+  --sg-foreground: #202023;
+  --sg-muted-foreground: #6c6677;
+  --sg-subtle-foreground: #766f7f;
+
+  /* ---- Lines ---------------------------------------------------------- */
+  --sg-border: #e7e2f0;
+  --sg-border-strong: #d5cde4;
+  --sg-input: #ffffff;
+
+  /* ---- Brand ---------------------------------------------------------- */
+  --sg-primary: #8642fe;
+  --sg-primary-hover: #7635ee;
+  --sg-primary-soft: #efe7ff;
+  --sg-primary-strong: #6d28d9;
+  --sg-primary-foreground: #ffffff;
+  --sg-accent: #deff00;
+  --sg-accent-soft: #f4ffb0;
+  --sg-accent-foreground: #202023;
+
+  /* ---- Signals -------------------------------------------------------- */
+  --sg-success: #157347;
+  --sg-success-soft: #d9f5e4;
+  --sg-warning: #94530a;
+  --sg-warning-soft: #ffefcf;
+  --sg-danger: #c42518;
+  --sg-danger-soft: #fde5e3;
+  --sg-danger-foreground: #ffffff;
+  --sg-info: #3d55e0;
+  --sg-info-soft: #e6e9ff;
+  --sg-ring: #8642fe;
+
+  /* ---- Shape ---------------------------------------------------------- */
+  --sg-radius-sm: 0.375rem;
+  --sg-radius: 0.625rem;
+  --sg-radius-lg: 0.875rem;
+  --sg-radius-xl: 1.25rem;
+
+  /* ---- Type ----------------------------------------------------------- */
+  --sg-font-sans:
+    'Instrument Sans Variable', 'Instrument Sans', ui-sans-serif, system-ui, -apple-system,
+    'Segoe UI', sans-serif;
+  --sg-font-display:
+    'Bricolage Grotesque Variable', 'Bricolage Grotesque', 'Instrument Sans Variable',
+    ui-sans-serif, system-ui, sans-serif;
+  --sg-font-mono:
+    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo,
+    monospace;
+
+  /* ---- Depth ---------------------------------------------------------- */
+  --sg-shadow-xs: 0 1px 2px rgb(32 32 35 / 0.06);
+  --sg-shadow-sm: 0 1px 2px rgb(32 32 35 / 0.05), 0 4px 12px -6px rgb(32 32 35 / 0.12);
+  --sg-shadow-md: 0 12px 32px -16px rgb(32 32 35 / 0.22), 0 2px 6px -2px rgb(32 32 35 / 0.08);
+  --sg-shadow-lg: 0 32px 64px -28px rgb(32 32 35 / 0.32), 0 4px 12px -6px rgb(32 32 35 / 0.12);
+}
+
+.sg-dark,
+[data-sg-theme='dark'] {
+  --sg-background: #141118;
+  --sg-surface: #1c1823;
+  --sg-surface-muted: #282130;
+  --sg-surface-inverse: #f4f1f7;
+  --sg-inverse-foreground: #1a1620;
+  --sg-foreground: #f5f2f8;
+  --sg-muted-foreground: #b0a8bd;
+  --sg-subtle-foreground: #8b8299;
+
+  --sg-border: #332b3e;
+  --sg-border-strong: #453a54;
+  --sg-input: #221c2b;
+
+  --sg-primary: #a57bff;
+  --sg-primary-hover: #b795ff;
+  --sg-primary-soft: #312348;
+  --sg-primary-strong: #d7c2ff;
+  --sg-primary-foreground: #1a1026;
+  --sg-accent: #deff00;
+  --sg-accent-soft: #39420a;
+  --sg-accent-foreground: #1a1d00;
+
+  --sg-success: #6fdca1;
+  --sg-success-soft: #14301f;
+  --sg-warning: #f2bd63;
+  --sg-warning-soft: #352610;
+  --sg-danger: #ff8a80;
+  --sg-danger-soft: #3c1917;
+  --sg-danger-foreground: #2a0b09;
+  --sg-info: #a3b0ff;
+  --sg-info-soft: #1d2340;
+  --sg-ring: #a57bff;
+
+  --sg-shadow-xs: 0 1px 2px rgb(0 0 0 / 0.4);
+  --sg-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.35), 0 4px 12px -6px rgb(0 0 0 / 0.5);
+  --sg-shadow-md: 0 12px 32px -16px rgb(0 0 0 / 0.65), 0 2px 6px -2px rgb(0 0 0 / 0.4);
+  --sg-shadow-lg: 0 32px 64px -28px rgb(0 0 0 / 0.8), 0 4px 12px -6px rgb(0 0 0 / 0.45);
+}
+
+@theme inline {
+  /* Generic Tailwind defaults, inlined so the published CSS never emits
+   * global --font-sans/--spacing/etc. that could override the host theme. */
+  --spacing: 0.25rem;
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-xl: 80rem;
+  --breakpoint-2xl: 96rem;
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: calc(1 / 0.75);
+  --text-sm: 0.875rem;
+  --text-sm--line-height: calc(1.25 / 0.875);
+  --text-base: 1rem;
+  --text-base--line-height: 1.5;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: calc(1.75 / 1.125);
+  --text-xl: 1.25rem;
+  --text-xl--line-height: calc(1.75 / 1.25);
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 2;
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: 2.25;
+  --container-sm: 24rem;
+  --container-md: 28rem;
+  --container-lg: 32rem;
+  --container-xl: 36rem;
+  --container-2xl: 42rem;
+  --container-4xl: 56rem;
+  --container-6xl: 72rem;
+  --radius-sm: 0.25rem;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --leading-tight: 1.25;
+  --leading-relaxed: 1.625;
+  --tracking-tight: -0.025em;
+  --tracking-wide: 0.025em;
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --default-transition-duration: 0.15s;
+  --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --color-sg-background: var(--sg-background);
+  --color-sg-surface: var(--sg-surface);
+  --color-sg-surface-muted: var(--sg-surface-muted);
+  --color-sg-surface-inverse: var(--sg-surface-inverse);
+  --color-sg-inverse-foreground: var(--sg-inverse-foreground);
+  --color-sg-foreground: var(--sg-foreground);
+  --color-sg-muted-foreground: var(--sg-muted-foreground);
+  --color-sg-subtle-foreground: var(--sg-subtle-foreground);
+
+  --color-sg-border: var(--sg-border);
+  --color-sg-border-strong: var(--sg-border-strong);
+  --color-sg-input: var(--sg-input);
+
+  --color-sg-primary: var(--sg-primary);
+  --color-sg-primary-hover: var(--sg-primary-hover);
+  --color-sg-primary-soft: var(--sg-primary-soft);
+  --color-sg-primary-strong: var(--sg-primary-strong);
+  --color-sg-primary-foreground: var(--sg-primary-foreground);
+  --color-sg-accent: var(--sg-accent);
+  --color-sg-accent-soft: var(--sg-accent-soft);
+  --color-sg-accent-foreground: var(--sg-accent-foreground);
+
+  --color-sg-success: var(--sg-success);
+  --color-sg-success-soft: var(--sg-success-soft);
+  --color-sg-warning: var(--sg-warning);
+  --color-sg-warning-soft: var(--sg-warning-soft);
+  --color-sg-danger: var(--sg-danger);
+  --color-sg-danger-soft: var(--sg-danger-soft);
+  --color-sg-danger-foreground: var(--sg-danger-foreground);
+  --color-sg-info: var(--sg-info);
+  --color-sg-info-soft: var(--sg-info-soft);
+  --color-sg-ring: var(--sg-ring);
+
+  --radius-sg-sm: var(--sg-radius-sm);
+  --radius-sg: var(--sg-radius);
+  --radius-sg-lg: var(--sg-radius-lg);
+  --radius-sg-xl: var(--sg-radius-xl);
+
+  --font-sg-sans: var(--sg-font-sans);
+  --font-sg-display: var(--sg-font-display);
+  --font-sg-mono: var(--sg-font-mono);
+
+  --shadow-sg-xs: var(--sg-shadow-xs);
+  --shadow-sg-sm: var(--sg-shadow-sm);
+  --shadow-sg-md: var(--sg-shadow-md);
+  --shadow-sg-lg: var(--sg-shadow-lg);
+
+  --animate-sg-pulse: sg-pulse 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-sg-shimmer: sg-shimmer 1.6s ease-in-out infinite;
+  --animate-sg-enter: sg-enter 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-sg-spin: sg-spin 0.8s linear infinite;
+  --animate-sg-bounce: sg-bounce 1s infinite;
+}
+
+@keyframes sg-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@keyframes sg-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes sg-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sg-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes sg-bounce {
+  0%,
+  100% {
+    transform: translateY(-20%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+@layer base {
+  /*
+   * The reset is scoped to `.sg-root` on purpose: importing a component
+   * library must not restyle the host application. Add `sg-root` to a wrapper
+   * (or to <body> in a fully sipgate-branded app) and the reset follows.
+   */
+  .sg-root,
+  .sg-root *,
+  .sg-root *::before,
+  .sg-root *::after {
+    box-sizing: border-box;
+    border-width: 0;
+    border-style: solid;
+    border-color: var(--sg-border);
+  }
+
+  .sg-root {
+    font-family: var(--sg-font-sans);
+    color: var(--sg-foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  .sg-root :where(button, input, textarea, select) {
+    font: inherit;
+    color: inherit;
+    letter-spacing: inherit;
+  }
+
+  .sg-root {
+    color-scheme: light;
+  }
+
+  .sg-root:is(.sg-dark, [data-sg-theme='dark']),
+  .sg-dark .sg-root,
+  [data-sg-theme='dark'] .sg-root {
+    color-scheme: dark;
+  }
+
+  .sg-root :where(button) {
+    background-color: transparent;
+  }
+
+  .sg-root ::selection {
+    background-color: var(--sg-accent);
+    color: var(--sg-accent-foreground);
+  }
+}
+
+/* A quiet dotted paper used behind empty and loading states. */
+@utility sg-grid-paper {
+  background-image: radial-gradient(
+    color-mix(in oklab, var(--sg-muted-foreground) 26%, transparent) 0.75px,
+    transparent 0.75px
+  );
+  background-size: 14px 14px;
+}
+
+@utility sg-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--sg-border-strong) transparent;
+}
+
+@utility sg-numeric {
+  font-family: var(--sg-font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* Fine hatch used for live/recording surfaces. */
+@utility sg-hatch {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    color-mix(in oklab, var(--sg-foreground) 8%, transparent) 0px,
+    color-mix(in oklab, var(--sg-foreground) 8%, transparent) 1px,
+    transparent 1px,
+    transparent 6px
+  );
+}
+
+/* Respect the system preference for the library's own decorative motion. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-sg-pulse,
+  .animate-sg-enter,
+  .animate-sg-shimmer {
+    animation: none !important;
+  }
+}

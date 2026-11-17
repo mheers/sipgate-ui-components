@@ -1,0 +1,41 @@
+name: Feature request
+description: Propose a new component, prop or domain behaviour.
+title: 'feat: '
+labels: ['enhancement']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This library is deliberately curated. The best proposals start from a sipgate workflow
+        and a concrete screen, not from a generic UI pattern.
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: Which sipgate workflow is hard today? Who is doing what, and where does it break?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: API sketch, screenshot, or a description of the component.
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Existing components, composition, or doing nothing.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Calls
+        - Messaging
+        - Contacts
+        - Devices and numbers
+        - Primitives and theming
+        - Accessibility
+        - Documentation
+        - Developer experience
+        - Other

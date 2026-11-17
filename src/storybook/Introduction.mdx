@@ -1,0 +1,167 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Introduction" />
+
+<div className="sg-doc-hero">
+  <p className="sg-doc-eyebrow">Vue 3 · Tailwind CSS 4 · reka-ui</p>
+  <h1
+    style={{ fontSize: '2.75rem', lineHeight: 1.02, margin: '0.6rem 0 1rem', maxWidth: '34rem' }}
+  >{`Telephony UI that feels human.`}</h1>
+  <p
+    className="sg-doc-lead"
+    style={{ position: 'relative', zIndex: 1 }}
+  >{`A component library for sipgate applications: live calls, call history, SMS threads, contacts, devices, numbers and voicemail. One considered visual language, accessible defaults, and the domain details that generic UI kits miss.`}</p>
+  <div
+    style={{
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: '0.4rem',
+      marginTop: '1.5rem',
+      position: 'relative',
+      zIndex: 1,
+    }}
+  >
+    <span className="sg-doc-pill">MIT licensed</span>
+    <span className="sg-doc-pill">Vue 3.5</span>
+    <span className="sg-doc-pill">TypeScript</span>
+    <span className="sg-doc-pill">Storybook 10</span>
+    <span className="sg-doc-pill">shadcn friendly</span>
+  </div>
+</div>
+
+## Why this library exists
+
+sipgate's API exposes the real texture of telephony: inbound, outbound and missed calls;
+GSM-7 and UCS-2 messages; faxes; devices that are online, busy or in do-not-disturb;
+numbers that need to be readable at a glance. Every application ends up rebuilding the same
+screens — and usually ends up with a different answer for how to format a number or count
+an SMS segment.
+
+This library centralises those answers. It ships domain components with the edge cases
+already handled, primitives to build the rest, and a Storybook that documents both.
+
+<p className="sg-doc-quote">{`The visual direction is a quiet control room: warm paper, ink, violet for action and one acid-lime signal reserved for things that are genuinely live.`}</p>
+
+## Install
+
+```bash
+pnpm add @mheers/sipgate-ui-components
+```
+
+`vue` is a peer dependency. Everything else is installed for you. Import the compiled
+stylesheet once — no Tailwind configuration is required in the host application:
+
+```ts
+import '@mheers/sipgate-ui-components/style.css';
+```
+
+Then scope the library to a wrapper. `.sg-root` provides the design tokens, font stack and a
+minimal scoped reset without touching the rest of your application:
+
+```html
+<div class="sg-root">
+  <!-- your sipgate UI -->
+</div>
+```
+
+Add `sg-dark` to the same element (or to `<html>`) for the dark theme. Components rendered in
+portals — dialogs and tooltips — carry their own scope.
+
+## A first call
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue';
+import {
+  ActiveCallCard,
+  CallHistoryList,
+  PhoneNumber,
+  type HistoryEntry,
+} from '@mheers/sipgate-ui-components';
+
+const muted = ref(false);
+const held = ref(false);
+const entries = ref<HistoryEntry[]>([]);
+</script>
+
+<template>
+  <ActiveCallCard
+    name="Anna de Vries"
+    number="+49 151 23456789"
+    :started-at="new Date()"
+    :muted="muted"
+    :recording="true"
+    @toggle-mute="muted = !muted"
+    @toggle-hold="held = !held"
+    @hangup="/* hang up through your API client */"
+  />
+
+  <CallHistoryList :entries="entries" @select="/* open a detail view */" />
+</template>
+```
+
+The components are controlled on purpose: they render state and emit intent. Your sipgate
+client stays the source of truth.
+
+## What's inside
+
+| Group             | Components                                                                                                                                                                                             |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Primitives**    | `Button` · `Input` · `Textarea` · `Label` · `Badge` · `Card` · `Avatar` · `Tabs` · `Switch` · `Tooltip` · `Dialog` · `Spinner` · `Skeleton` · `Separator` · `EmptyState` · `CopyButton` · `PageHeader` |
+| **Communication** | `CommunicationBadge` · `CommunicationIcon` · `PhoneNumber` · `CallTimer`                                                                                                                               |
+| **Calls**         | `ActiveCallCard` · `CallHistoryItem` · `CallHistoryList`                                                                                                                                               |
+| **Messaging**     | `SmsComposer` · `SmsBubble` · `SmsThread` · `VoicemailPlayer`                                                                                                                                          |
+| **Directory**     | `ContactListItem` · `DeviceCard` · `DeviceStatusBadge` · `AccountBalance` · `ConnectionStatus`                                                                                                         |
+| **Utilities**     | phone parsing and formatting · GSM-7/UCS-2 segment analysis · duration, date and currency formatting · initials and avatar tones · `useClipboard` · `useCallDuration`                                  |
+
+Every component has a Storybook page with props, states and accessibility notes.
+
+## Design principles
+
+<div className="sg-doc-grid">
+  <div className="sg-doc-card">
+    <h3>Domain first</h3>
+    <p>{`Things generic kits get wrong: GSM-7 extension characters, missed versus rejected calls, national trunk prefixes, hold time. The components know.`}</p>
+  </div>
+  <div className="sg-doc-card">
+    <h3>Quiet by default</h3>
+    <p>{`One primary action per surface. Lime is only for live audio and answer. Colour is never the only carrier of meaning.`}</p>
+  </div>
+  <div className="sg-doc-card">
+    <h3>Accessible by construction</h3>
+    <p>{`Visible focus rings, real labels, semantic live regions, keyboard paths for tabs, dialogs and the voicemail scrubber.`}</p>
+  </div>
+  <div className="sg-doc-card">
+    <h3>Coexists with shadcn</h3>
+    <p>
+      {`All tokens are prefixed with `}
+      <code>sg</code>
+      {`, the reset is scoped and the CSS is precompiled. Drop it next to your existing theme.`}
+    </p>
+  </div>
+</div>
+
+## Run it locally
+
+```bash
+pnpm install
+pnpm dev          # Storybook on http://localhost:6006
+pnpm example:dev  # the cockpit example on http://localhost:5173
+pnpm test         # unit tests for formatting, SMS analysis and components
+pnpm build        # library bundle, CSS and type declarations
+```
+
+The **Patterns → Cockpit** story and the `examples/cockpit` app are the same composition —
+a realistic dashboard that exercises the whole library.
+
+## Compatibility
+
+- Vue `^3.5`
+- Modern evergreen browsers; the CSS uses custom properties, `oklch` and `color-mix`
+- Node `>= 20.19` for development only
+- No Tailwind installation required in the host app; the published `style.css` is compiled
+
+## License
+
+MIT © [Marcel Heers](https://github.com/mheers). This is a community project, not an official
+sipgate product. sipgate is a trademark of sipgate GmbH.
