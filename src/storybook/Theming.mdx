@@ -126,23 +126,22 @@ If you skip the imports, the stack falls back to system UI fonts and the layout 
 ## Coexisting with shadcn
 
 Most sipgate apps are already shadcn projects. The library does not ship Tailwind
-preflight and does not define generic tokens, so it can sit beside your theme:
+preflight and does not define generic tokens, so it can sit beside your theme. The packaged
+adapter maps the complete shadcn token set:
 
-```css
-/* Optional: borrow your app's brand for the library */
-.sg-root {
-  --sg-primary: var(--primary);
-  --sg-primary-foreground: var(--primary-foreground);
-  --sg-ring: var(--ring);
-  --sg-border: var(--border);
-}
+```ts
+// main.ts
+import '@mheers/sipgate-ui-components/style.css';
+import './assets/index.css'; // your shadcn + Tailwind entry
+import '@mheers/sipgate-ui-components/shadcn.css';
 ```
 
-The compiled `style.css` contains only the utilities the components use, prefixed classes and
-the scoped reset. Add `.sg-root` to a wrapper (or to `<body>` if the entire app is sipgate
+Add `data-sg-preset="shadcn"` to the `.sg-root` wrapper to match shadcn's card spacing and
+type. The compiled `style.css` contains only the utilities the components use, prefixed classes
+and the scoped reset. Add `.sg-root` to a wrapper (or to `<body>` if the entire app is sipgate
 branded). Dialogs and tooltips render in a portal with their own `.sg-root` class, so they keep
 typography and the reset; the dark theme must be on `<html>` for those portals to follow it.
-Continue with **Foundations → Using with shadcn** for the complete token bridge and load-order
+Continue with **Foundations → Using with shadcn** for the complete bridge and load-order
 advice.
 
 ## The reset, precisely

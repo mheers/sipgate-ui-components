@@ -5,7 +5,11 @@ defineProps<{ class?: string }>();
 </script>
 
 <template>
-  <p :class="cn('text-[0.8125rem] leading-relaxed text-current/70', $props.class)">
+  <p
+    :class="
+      cn('sg-card-description text-[0.8125rem] leading-relaxed text-current/70', $props.class)
+    "
+  >
     <slot />
   </p>
 </template>

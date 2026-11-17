@@ -49,6 +49,7 @@
       "import": "./dist/index.js"
     },
     "./style.css": "./dist/style.css",
+    "./shadcn.css": "./dist/shadcn.css",
     "./package.json": "./package.json"
   },
   "publishConfig": {
@@ -60,7 +61,7 @@
   "scripts": {
     "dev": "storybook dev -p 6006",
     "storybook": "storybook dev -p 6006",
-    "build": "vite build && vue-tsc -p tsconfig.build.json --emitDeclarationOnly",
+    "build": "vite build && node scripts/build-styles.mjs && vue-tsc -p tsconfig.build.json --emitDeclarationOnly",
     "build:storybook": "storybook build",
     "preview:storybook": "npx --yes http-server storybook-static -p 6007 -c-1",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json",

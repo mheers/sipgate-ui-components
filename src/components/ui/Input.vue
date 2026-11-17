@@ -26,14 +26,14 @@ const inputAttrs = computed(() => {
 });
 
 const sizes = {
-  sm: 'h-8 text-[0.8125rem]',
-  md: 'h-10 text-sm',
-  lg: 'h-11 text-[0.9375rem]',
+  sm: 'h-[var(--sg-control-height-sm)] text-[0.8125rem]',
+  md: 'h-[var(--sg-control-height)] text-sm',
+  lg: 'h-[var(--sg-control-height-lg)] text-[0.9375rem]',
 } as const;
 
 const rootClasses = computed(() =>
   cn(
-    'group flex items-center gap-2 rounded-sg border bg-sg-input px-3 shadow-sg-xs transition-[border-color,box-shadow] duration-150',
+    'sg-input group flex items-center gap-2 rounded-sg border bg-sg-input px-3 shadow-sg-xs transition-[border-color,box-shadow] duration-150',
     'border-sg-border-strong focus-within:border-sg-primary focus-within:ring-2 focus-within:ring-sg-ring/25',
     props.invalid &&
       'border-sg-danger focus-within:border-sg-danger focus-within:ring-sg-danger/20',

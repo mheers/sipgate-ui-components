@@ -4,6 +4,27 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- A packaged `@mheers/sipgate-ui-components/shadcn.css` adapter that maps shadcn's
+  surfaces, lines, actions, status colours, radii, control heights and fonts onto the
+  library's `--sg-*` tokens.
+- Host-tunable control heights (`--sg-control-height-sm`, `--sg-control-height`,
+  `--sg-control-height-lg`) and a dialog radius (`--sg-dialog-radius`).
+- An opt-in `data-sg-preset="shadcn"` card scale that matches stock shadcn spacing and
+  type.
+- README and Storybook guidance for dense shadcn shells, including odoo's bundle gate
+  and lazy-loading requirement.
+
+### Changed
+
+- `Button` and `Input` sizes now read the control-height tokens instead of fixed
+  `h-8`/`h-10`/`h-11` utilities. The default visual scale is unchanged.
+- The shadcn bridge maps `--success`, `--warning` and `--info` when the host defines
+  them, falling back to the library signals otherwise.
+
 ## [0.1.1] — 2026-11-17
 
 ### Added

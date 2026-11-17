@@ -37,7 +37,7 @@ const dots = {
 
 const classes = computed(() =>
   cn(
-    'inline-flex items-center gap-1.5 rounded-full font-medium tracking-[0.02em] whitespace-nowrap',
+    'sg-badge inline-flex items-center gap-1.5 rounded-full font-medium tracking-[0.02em] whitespace-nowrap',
     props.size === 'sm' ? 'px-2 py-0.5 text-[0.6875rem]' : 'px-2.5 py-1 text-xs',
     variants[props.variant],
     props.class,

@@ -5,7 +5,7 @@ defineProps<{ class?: string }>();
 </script>
 
 <template>
-  <div :class="cn('flex flex-col gap-1 px-5 pt-5', $props.class)">
+  <div :class="cn('sg-card-header flex flex-col gap-1 px-5 pt-5', $props.class)">
     <slot />
   </div>
 </template>

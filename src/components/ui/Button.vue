@@ -3,7 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 
 export const buttonVariants = cva(
   [
-    'relative inline-flex items-center justify-center gap-2 rounded-sg whitespace-nowrap select-none',
+    'sg-button relative inline-flex items-center justify-center gap-2 rounded-sg whitespace-nowrap select-none',
     'leading-none font-medium outline-none',
     'transition-[background-color,color,box-shadow,border-color,transform] duration-150 ease-out',
     'focus-visible:ring-2 focus-visible:ring-sg-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sg-background',
@@ -30,12 +30,12 @@ export const buttonVariants = cva(
           'border border-sg-inverse-foreground/25 bg-transparent text-sg-inverse-foreground hover:bg-sg-inverse-foreground/10 focus-visible:ring-sg-accent focus-visible:ring-offset-sg-surface-inverse',
       },
       size: {
-        sm: 'h-8 gap-1.5 px-3 text-[0.8125rem] [&_svg]:size-4',
-        md: 'h-10 px-4 text-sm [&_svg]:size-4',
-        lg: 'h-11 px-5 text-[0.9375rem] [&_svg]:size-[1.125rem]',
-        icon: 'size-10 [&_svg]:size-4',
-        'icon-sm': 'size-8 [&_svg]:size-4',
-        'icon-lg': 'size-11 [&_svg]:size-5',
+        sm: 'h-[var(--sg-control-height-sm)] gap-1.5 px-3 text-[0.8125rem] [&_svg]:size-4',
+        md: 'h-[var(--sg-control-height)] px-4 text-sm [&_svg]:size-4',
+        lg: 'h-[var(--sg-control-height-lg)] px-5 text-[0.9375rem] [&_svg]:size-[1.125rem]',
+        icon: 'size-[var(--sg-control-height)] [&_svg]:size-4',
+        'icon-sm': 'size-[var(--sg-control-height-sm)] [&_svg]:size-4',
+        'icon-lg': 'size-[var(--sg-control-height-lg)] [&_svg]:size-5',
       },
       block: {
         true: 'w-full',

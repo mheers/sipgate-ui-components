@@ -70,6 +70,16 @@
   --sg-radius: 0.625rem;
   --sg-radius-lg: 0.875rem;
   --sg-radius-xl: 1.25rem;
+  --sg-dialog-radius: var(--sg-radius-xl);
+
+  /* ---- Control scale --------------------------------------------------
+   * Hosts with a denser or larger form scale can override these three
+   * without touching a component. The defaults preserve the library scale:
+   * sm 32px, md 40px, lg 44px.
+   */
+  --sg-control-height-sm: 2rem;
+  --sg-control-height: 2.5rem;
+  --sg-control-height-lg: 2.75rem;
 
   /* ---- Type ----------------------------------------------------------- */
   --sg-font-sans:

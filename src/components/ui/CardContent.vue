@@ -5,7 +5,7 @@ defineProps<{ class?: string }>();
 </script>
 
 <template>
-  <div :class="cn('px-5 py-4', $props.class)">
+  <div :class="cn('sg-card-content px-5 py-4', $props.class)">
     <slot />
   </div>
 </template>

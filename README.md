@@ -285,6 +285,8 @@ Tokens are prefixed on purpose. A shadcn app can borrow its own brand without a 
 }
 ```
 
+The packaged `shadcn.css` adapter below does this and more.
+
 ### Using it inside a shadcn app
 
 The library is built for coexistence, not replacement: prefixed `--sg-*` tokens, a reset scoped
@@ -292,79 +294,78 @@ to `.sg-root`, and primitives built on the same reka-ui + cva foundation as shad
 
 Three details make it seamless:
 
-1. **Load order.** Import the library stylesheet before your Tailwind entry so your theme stays
-   authoritative for shared utility names:
+1. **Load order.** Import the library stylesheet before your Tailwind entry, then the
+   packaged adapter:
 
    ```ts
    // main.ts
    import '@mheers/sipgate-ui-components/style.css';
    import './assets/index.css'; // shadcn + Tailwind
+   import '@mheers/sipgate-ui-components/shadcn.css';
    ```
+
+   `shadcn.css` is a ready-made, unlayered bridge. It maps surfaces, lines, actions, status
+   colours, radii, the control scale and the font stack. It never emits generic
+   `--background`, `--primary` or `--radius` variables.
 
 2. **Render the library inside `.sg-root`.**
 
-3. **Bridge the tokens.** Put this after both stylesheets, unlayered, so it wins over the
-   library defaults:
+3. **Optionally opt into shadcn’s card scale** with `data-sg-preset="shadcn"` on the
+   `.sg-root` wrapper. Without it the library keeps its denser card spacing and type.
 
-   ```css
-   .sg-root {
-     /* Surfaces */
-     --sg-background: var(--background);
-     --sg-surface: var(--card);
-     --sg-surface-muted: var(--muted);
-     --sg-surface-inverse: var(--foreground);
-     --sg-inverse-foreground: var(--background);
-     --sg-foreground: var(--foreground);
-     /* Nudged toward the foreground so 11px badges keep AA on --muted. */
-     --sg-muted-foreground: color-mix(in oklab, var(--muted-foreground) 82%, var(--foreground));
-     --sg-subtle-foreground: color-mix(in oklab, var(--muted-foreground) 82%, var(--foreground));
-
-     /* Lines — note that shadcn's --input is a border, not an input surface */
-     --sg-border: var(--border);
-     --sg-border-strong: var(--input);
-     --sg-input: var(--background);
-
-     /* Action */
-     --sg-primary: var(--primary);
-     --sg-primary-foreground: var(--primary-foreground);
-     --sg-primary-hover: color-mix(in oklab, var(--primary) 88%, var(--foreground));
-     --sg-primary-soft: color-mix(in oklab, var(--primary) 12%, var(--background));
-     --sg-primary-strong: color-mix(in oklab, var(--primary) 82%, var(--foreground));
-     --sg-ring: var(--ring);
-     --sg-danger: var(--destructive, #c42518);
-     --sg-danger-foreground: var(--destructive-foreground, #fff);
-     --sg-danger-soft: color-mix(in oklab, var(--destructive, #c42518) 12%, var(--background));
-
-     /* Shape */
-     --sg-radius-sm: calc(var(--radius, 0.625rem) - 4px);
-     --sg-radius: var(--radius, 0.625rem);
-     --sg-radius-lg: calc(var(--radius, 0.625rem) + 4px);
-     --sg-radius-xl: calc(var(--radius, 0.625rem) + 8px);
-
-     /* Type — omit to keep Instrument Sans / Bricolage / JetBrains Mono */
-     --sg-font-sans: var(
-       --font-sans,
-       'Instrument Sans Variable',
-       ui-sans-serif,
-       system-ui,
-       sans-serif
-     );
-     --sg-font-display: var(
-       --font-heading,
-       var(--font-sans, 'Instrument Sans Variable', ui-sans-serif, system-ui, sans-serif)
-     );
-     --sg-font-mono: var(--font-mono, 'JetBrains Mono Variable', ui-monospace, monospace);
-   }
+   ```html
+   <div class="sg-root" data-sg-preset="shadcn">
+     <!-- library components -->
+   </div>
    ```
 
 The library also recognises shadcn's `.dark` class on `<html>`, alongside `.sg-dark` and
 `[data-sg-theme="dark"]`. No class syncing is needed for dark mode. Keep the dark class on
 `<html>` so portalled dialogs and tooltips inherit it too.
 
-Deliberately **not** mapped: `--sg-accent` (the acid-lime live-audio signal) and the
-success/warning/info semaphores. Map those only if your product defines equivalents. The full
-integration page, including what each bridge token affects, lives in
+### What the bridge changes
+
+| Host token                                    | Library token                                       | Effect                                     |
+| --------------------------------------------- | --------------------------------------------------- | ------------------------------------------ |
+| `--background`                                | `--sg-background`                                   | page surface                               |
+| `--card`                                      | `--sg-surface`                                      | cards, dialogs, composer                   |
+| `--muted`                                     | `--sg-surface-muted`                                | quiet surfaces, empty states               |
+| `--foreground`                                | `--sg-foreground`                                   | text; also the inverse balance/call card   |
+| `--border` / `--input`                        | `--sg-border` / `--sg-border-strong`                | hairlines and input borders                |
+| `--primary` / `--primary-foreground`          | `--sg-primary` / `--sg-primary-foreground`          | primary actions                            |
+| `--ring`                                      | `--sg-ring`                                         | focus rings                                |
+| `--destructive`                               | `--sg-danger`                                       | destructive actions and errors             |
+| `--success` / `--warning` / `--info`          | `--sg-success` / `--sg-warning` / `--sg-info`       | status signals, when the host defines them |
+| `--radius-sm` / `--radius-md` / `--radius-xl` | `--sg-radius-sm` / `--sg-radius` / `--sg-radius-lg` | controls and cards                         |
+| `--font-sans` / `--font-mono`                 | `--sg-font-sans` / `--sg-font-mono`                 | UI and mono type                           |
+
+Control heights are host-tunable rather than baked into components: the adapter sets
+`--sg-control-height-sm: 2rem`, `--sg-control-height: 2.25rem` and
+`--sg-control-height-lg: 2.5rem`, matching shadcn's `h-8` / `h-9` / `h-10` scale. Dialogs use
+`--sg-dialog-radius`, which the adapter maps to shadcn's `rounded-lg`.
+
+`--sg-accent` is deliberately **not** mapped. It is the acid-lime live-audio signal; shadcn's
+`--accent` is usually a neutral hover surface. Mapping it would erase the signal. Map it
+yourself only if the host wants a neutral accent. The full integration page lives in
 **Storybook → Foundations → Using with shadcn**.
+
+### Odoo and other dense shadcn shells
+
+The `odoo/web` frontend is a Vue 3 + Tailwind 4 shadcn-style app. It uses the same token names,
+so `shadcn.css` works as-is, with three adjustments:
+
+- **Cards.** Add `data-sg-preset="shadcn"` to the wrapper to match odoo's `p-6` card header and
+  `text-lg` title.
+- **Dialogs.** Odoo's hand-rolled dialogs use `rounded-md`; add
+  `.sg-root { --sg-dialog-radius: var(--radius-md); }` after the adapter.
+- **Bundle gate.** Keep sipgate imports out of the entry chunk. Odoo's entry is around
+  569.6 KB against a 575 KB limit, and all of its pages are lazy-loaded. Import sipgate
+  components and the stylesheet from the lazy page/component, never from `main.ts` or
+  `AppShell.vue`.
+
+Odoo already has Vue, `cva`, `clsx` and `tailwind-merge`, but not `reka-ui` or
+`lucide-vue-next`. `Button`, `Card` and the domain components tree-shake those out; `Dialog`,
+`Tabs` and `Switch` add `reka-ui` to the lazy chunk.
 
 ### Bundle size
 
@@ -378,6 +379,9 @@ tree-shake. Measured with Vite 8, minified and gzipped, **including Vue**:
 | Dashboard subset (history, SMS, dialog, cards) | ~67 KB | ~41 KB                    |
 | Every component                                | ~90 KB | ~64 KB                    |
 | Published stylesheet                           | ~8 KB  | one-time                  |
+
+The optional `shadcn.css` adapter is 6.0 KB raw / ~2.0 KB gzip. It is plain CSS, not a runtime
+dependency.
 
 A `Button`-only bundle contains no unused reka-ui primitives or lucide icons. In a shadcn app
 the shared building blocks — Vue, reka-ui, lucide-vue-next, `cva`, `clsx`, `tailwind-merge` —
@@ -451,8 +455,11 @@ true consumer example.
 │   ├── composables/       # useCallDuration, useClipboard
 │   ├── lib/               # formatting, phone, SMS, types, cn
 │   ├── storybook/         # fixtures and MDX documentation
-│   ├── styles/index.css   # tokens, theme mapping, scoped reset
+│   ├── styles/
+│   │   ├── index.css      # tokens, theme mapping, scoped reset
+│   │   └── shadcn.css     # optional shadcn/odoo token adapter
 │   └── index.ts           # public API
+├── scripts/               # build helpers (adapter stylesheet copy)
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
 └── LICENSE
@@ -460,17 +467,17 @@ true consumer example.
 
 ## Development
 
-| Script                              | What it does                                            |
-| ----------------------------------- | ------------------------------------------------------- |
-| `pnpm dev`                          | Storybook on port 6006                                  |
-| `pnpm example:dev`                  | Cockpit example on port 5173                            |
-| `pnpm example:build:dist`           | Cockpit against the compiled package (release check)    |
-| `pnpm build`                        | ES bundle, `style.css` and `.d.ts` declarations         |
-| `pnpm build:storybook`              | Static Storybook in `storybook-static/`                 |
-| `pnpm typecheck`                    | `vue-tsc` over source, stories, configs and the example |
-| `pnpm test`                         | Vitest unit and component tests                         |
-| `pnpm lint`                         | Typecheck plus tests                                    |
-| `pnpm format` / `pnpm format:check` | Prettier with Tailwind class sorting                    |
+| Script                              | What it does                                                  |
+| ----------------------------------- | ------------------------------------------------------------- |
+| `pnpm dev`                          | Storybook on port 6006                                        |
+| `pnpm example:dev`                  | Cockpit example on port 5173                                  |
+| `pnpm example:build:dist`           | Cockpit against the compiled package (release check)          |
+| `pnpm build`                        | ES bundle, `style.css`, `shadcn.css` and `.d.ts` declarations |
+| `pnpm build:storybook`              | Static Storybook in `storybook-static/`                       |
+| `pnpm typecheck`                    | `vue-tsc` over source, stories, configs and the example       |
+| `pnpm test`                         | Vitest unit and component tests                               |
+| `pnpm lint`                         | Typecheck plus tests                                          |
+| `pnpm format` / `pnpm format:check` | Prettier with Tailwind class sorting                          |
 
 Requirements: Node `>= 20.19` (`.nvmrc` pins 22), pnpm 10.
 
@@ -482,6 +489,7 @@ There is intentionally **no CI**. Releases are a local, reviewed step — see
 - Vue `^3.5`
 - Modern evergreen browsers (custom properties, `color-mix`)
 - No Tailwind installation required in the host app; the published stylesheet is compiled
+- Optional `shadcn.css` adapter for shadcn/odoo token shells
 - Works next to an existing shadcn theme thanks to the `sg` token prefix and scoped reset
 
 ## Contributing

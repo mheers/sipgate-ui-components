@@ -1,0 +1,159 @@
+/*
+ * shadcn adapter for @mheers/sipgate-ui-components
+ * =================================================
+ *
+ * Import order matters:
+ *
+ *   import '@mheers/sipgate-ui-components/style.css';
+ *   import './assets/index.css';                 // your shadcn + Tailwind entry
+ *   import '@mheers/sipgate-ui-components/shadcn.css';
+ *
+ * The adapter is intentionally unlayered so its `.sg-root` declarations win
+ * over the library defaults. It only sets `--sg-*` variables and a small,
+ * opt-in card preset; it never emits generic `--background`, `--primary` or
+ * `--radius` variables that could fight the host theme.
+ *
+ * Render library components inside `.sg-root`. Portalled dialogs, tooltips
+ * and other overlays carry `.sg-root` themselves, so the bridge follows them.
+ */
+
+.sg-root {
+  /* ---- Surfaces ------------------------------------------------------- */
+  --sg-background: var(--background, #faf9f6);
+  --sg-surface: var(--card, var(--background, #ffffff));
+  --sg-surface-muted: var(--muted, #f2eefb);
+  --sg-surface-inverse: var(--foreground, #202023);
+  --sg-inverse-foreground: var(--background, #f7f5fa);
+  --sg-foreground: var(--foreground, #202023);
+
+  /*
+   * Nudged toward the foreground so the library's 11px badges and metadata
+   * keep AA contrast on `--muted`. A direct `var(--muted-foreground)` bridge
+   * fails at that size in several shadcn palettes.
+   */
+  --sg-muted-foreground: color-mix(
+    in oklab,
+    var(--muted-foreground, #6c6677) 82%,
+    var(--foreground, #202023)
+  );
+  --sg-subtle-foreground: color-mix(
+    in oklab,
+    var(--muted-foreground, #6c6677) 82%,
+    var(--foreground, #202023)
+  );
+
+  /* ---- Lines ---------------------------------------------------------- */
+  --sg-border: var(--border, #e7e2f0);
+  /* shadcn's --input is a border colour, not an input surface. */
+  --sg-border-strong: var(--input, var(--border, #d5cde4));
+  /* Inputs sit on whatever surface contains them, like shadcn's bg-transparent. */
+  --sg-input: transparent;
+
+  /* ---- Action --------------------------------------------------------- */
+  --sg-primary: var(--primary, #8642fe);
+  --sg-primary-foreground: var(--primary-foreground, #ffffff);
+  --sg-primary-hover: color-mix(in oklab, var(--primary, #8642fe) 88%, var(--foreground, #202023));
+  --sg-primary-soft: color-mix(in oklab, var(--primary, #8642fe) 12%, var(--background, #ffffff));
+  --sg-primary-strong: color-mix(in oklab, var(--primary, #8642fe) 82%, var(--foreground, #202023));
+  --sg-ring: var(--ring, #8642fe);
+
+  --sg-danger: var(--destructive, #c42518);
+  --sg-danger-foreground: var(--destructive-foreground, #ffffff);
+  --sg-danger-soft: color-mix(
+    in oklab,
+    var(--destructive, #c42518) 12%,
+    var(--background, #ffffff)
+  );
+
+  /*
+   * Host status colours are used when the host defines them. The fallbacks are
+   * the library's own signals, so a host without success/warning/info tokens
+   * still gets a complete palette.
+   */
+  --sg-success: var(--success, #157347);
+  --sg-success-soft: color-mix(in oklab, var(--success, #157347) 14%, var(--background, #ffffff));
+  --sg-warning: var(--warning, #94530a);
+  --sg-warning-soft: color-mix(in oklab, var(--warning, #94530a) 14%, var(--background, #ffffff));
+  --sg-info: var(--info, #3d55e0);
+  --sg-info-soft: color-mix(in oklab, var(--info, #3d55e0) 14%, var(--background, #ffffff));
+
+  /*
+   * `--sg-accent` is intentionally not mapped. It is the acid-lime live-audio
+   * signal; shadcn's `--accent` is usually a neutral hover surface. Map it
+   * only if the host wants to give up that signal.
+   */
+
+  /* ---- Shape ---------------------------------------------------------- */
+  /*
+   * shadcn's stock recipes use: buttons/inputs rounded-md, cards rounded-xl,
+   * dialogs rounded-lg. The fallbacks keep the bridge useful in a theme that
+   * defines only the `--radius` base.
+   */
+  --sg-radius-sm: var(--radius-sm, calc(var(--radius, 0.625rem) - 4px));
+  --sg-radius: var(--radius-md, calc(var(--radius, 0.625rem) - 2px));
+  --sg-radius-lg: var(--radius-xl, calc(var(--radius, 0.625rem) + 4px));
+  --sg-radius-xl: calc(var(--radius, 0.625rem) + 8px);
+  --sg-dialog-radius: var(--radius-lg, var(--radius, 0.625rem));
+
+  /* ---- Control scale -------------------------------------------------- */
+  /* shadcn's default controls: sm h-8, default h-9, lg h-10. */
+  --sg-control-height-sm: 2rem;
+  --sg-control-height: 2.25rem;
+  --sg-control-height-lg: 2.5rem;
+
+  /* ---- Type ----------------------------------------------------------- */
+  /* Remove these to keep Instrument Sans / Bricolage / JetBrains Mono. */
+  --sg-font-sans: var(
+    --font-sans,
+    'Instrument Sans Variable',
+    ui-sans-serif,
+    system-ui,
+    sans-serif
+  );
+  --sg-font-display: var(
+    --font-heading,
+    var(--font-sans, 'Instrument Sans Variable', ui-sans-serif, system-ui, sans-serif)
+  );
+  --sg-font-mono: var(--font-mono, 'JetBrains Mono Variable', ui-monospace, monospace);
+
+  /*
+   * Shadows are not bridged: shadcn/Tailwind do not expose their shadow
+   * utilities as stable CSS variables. Override `--sg-shadow-*` directly if
+   * the host defines its own shadow scale.
+   */
+}
+
+/*
+ * Optional: match stock shadcn card spacing and type. Add
+ * `data-sg-preset="shadcn"` to the `.sg-root` wrapper. Leave it off if your
+ * theme deliberately uses the library's denser card.
+ *
+ * This is scoped to `.sg-root` because cards are inline. Dialogs are
+ * portalled, so their radius is driven by `--sg-dialog-radius` above.
+ */
+.sg-root[data-sg-preset='shadcn'] .sg-card-header {
+  gap: 0.375rem;
+  padding: 1.5rem;
+}
+
+.sg-root[data-sg-preset='shadcn'] .sg-card-title {
+  font-size: 1.125rem;
+  line-height: 1;
+  letter-spacing: -0.025em;
+}
+
+.sg-root[data-sg-preset='shadcn'] .sg-card-description {
+  color: var(--muted-foreground, var(--sg-muted-foreground));
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.sg-root[data-sg-preset='shadcn'] .sg-card-content {
+  padding: 1.5rem;
+  padding-top: 0;
+}
+
+.sg-root[data-sg-preset='shadcn'] .sg-card-footer {
+  padding: 1.5rem;
+  padding-top: 0;
+}

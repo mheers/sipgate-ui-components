@@ -20,7 +20,7 @@ const variants = {
 
 const classes = computed(() =>
   cn(
-    'relative rounded-sg-lg border',
+    'sg-card relative rounded-sg-lg border',
     variants[props.variant],
     props.variant !== 'inverse' && 'shadow-sg-xs',
     props.interactive &&

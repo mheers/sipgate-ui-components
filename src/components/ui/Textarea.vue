@@ -30,7 +30,7 @@ onMounted(resize);
 
 const classes = computed(() =>
   cn(
-    'block w-full rounded-sg border border-sg-border-strong bg-sg-input px-3 py-2.5 text-sm leading-relaxed text-sg-foreground shadow-sg-xs transition-[border-color,box-shadow] duration-150 outline-none',
+    'sg-textarea block w-full rounded-sg border border-sg-border-strong bg-sg-input px-3 py-2.5 text-sm leading-relaxed text-sg-foreground shadow-sg-xs transition-[border-color,box-shadow] duration-150 outline-none',
     'placeholder:text-sg-subtle-foreground focus:border-sg-primary focus:ring-2 focus:ring-sg-ring/25',
     props.invalid && 'border-sg-danger focus:border-sg-danger focus:ring-sg-danger/20',
     props.disabled && 'cursor-not-allowed bg-sg-surface-muted opacity-60',
