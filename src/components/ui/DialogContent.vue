@@ -9,8 +9,8 @@ import {
   type DialogContentProps,
 } from 'reka-ui';
 import { X } from 'lucide-vue-next';
-import { cn } from '@/lib/cn';
-import { reactiveOmit } from '@/lib/reactiveOmit';
+import { cn } from '../../lib/cn';
+import { reactiveOmit } from '../../lib/reactiveOmit';
 
 const props = withDefaults(
   defineProps<DialogContentProps & { class?: string; showClose?: boolean }>(),

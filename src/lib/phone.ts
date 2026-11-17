@@ -96,7 +96,26 @@ const TWO_DIGIT_CODES = new Set([
 
 const ONE_DIGIT_CODES = new Set(['1', '7']);
 
-/** Longest first so `030` wins over `03`. */
+/** Countries that write a national trunk prefix `0` in front of the area code. */
+const ZERO_TRUNK_CODES = new Set([
+  '49',
+  '43',
+  '41',
+  '44',
+  '31',
+  '32',
+  '33',
+  '353',
+  '46',
+  '48',
+  '90',
+]);
+
+/**
+ * German area codes, with the big city codes first so `030`, `040`, `069`
+ * and `089` always win over longer prefixes. The list is a display heuristic,
+ * not a numbering-plan authority.
+ */
 const DE_AREA_CODES = [
   '30',
   '40',
@@ -259,8 +278,12 @@ const DE_AREA_CODES = [
   '299',
 ];
 
-function digitsOnly(value: string): string {
-  return value.replace(/[^\d+]/g, '');
+function normaliseInput(value: string): string {
+  let cleaned = value.replace(/^tel:/i, '').replace(/[^\d+]/g, '');
+  // Keep only a leading plus, and drop a stray trunk zero before the country
+  // code (`+0049…`). No calling code starts with zero.
+  cleaned = cleaned.replace(/(?!^)\+/g, '').replace(/^\+0+/, '+');
+  return cleaned;
 }
 
 function countryCodeFor(country: string): string {
@@ -288,7 +311,7 @@ function splitCountryCode(e164: string): { countryCode: string; national: string
 
 /**
  * Normalise a phone number to E.164. Accepts `+49…`, `0049…`, `030…`
- * (with `country: 'DE'`), and messy punctuation.
+ * (with `country: 'DE'`), `+49 (0) 30…`, and messy punctuation.
  *
  * Returns `null` when the input does not contain a usable number.
  */
@@ -300,10 +323,12 @@ export function parsePhoneNumber(
   const raw = String(value).trim();
   if (!raw) return null;
 
-  let cleaned = digitsOnly(raw.replace(/^tel:/i, ''));
-  if (!cleaned) return null;
+  let cleaned = normaliseInput(raw);
+  if (!cleaned || cleaned === '+') return null;
 
   if (cleaned.startsWith('00')) cleaned = `+${cleaned.slice(2)}`;
+  cleaned = cleaned.replace(/^\+0+/, '+');
+  if (cleaned === '+') return null;
 
   if (!cleaned.startsWith('+')) {
     if (cleaned.startsWith('0')) {
@@ -315,10 +340,18 @@ export function parsePhoneNumber(
     }
   }
 
+  let { countryCode, national } = splitCountryCode(cleaned);
+
+  // `+49 (0) 30…` and `0049 (0) 30…` are common ways to write a number with
+  // the national trunk prefix. Only strip it in countries that actually use
+  // one: Italy (and San Marino) keep the leading zero as part of the number.
+  if (national.startsWith('0') && ZERO_TRUNK_CODES.has(countryCode)) {
+    national = national.replace(/^0+/, '');
+    cleaned = `+${countryCode}${national}`;
+  }
+
   const digits = cleaned.slice(1);
   if (digits.length < 6) return null;
-
-  const { countryCode, national } = splitCountryCode(cleaned);
   if (!countryCode || !national) return null;
 
   return {
@@ -397,10 +430,16 @@ function formatNationalGroups(countryCode: string, national: string): string {
       return [area, ...chunkEvery(national.slice(area.length), 4)].join(' ').trim();
     }
     case '33': {
-      const area = '12345'.includes(national.slice(0, 1))
-        ? national.slice(0, 1)
-        : national.slice(0, 2);
-      return [area, ...chunkEvery(national.slice(area.length), 2)].join(' ').trim();
+      // French national numbers are nine digits; mobiles start with 6 or 7
+      // and the first digit is its own group.
+      const area = national.slice(0, 1);
+      return [area, ...chunkEvery(national.slice(1), 2)].join(' ').trim();
+    }
+    case '39': {
+      // Italy keeps the leading zero as part of the national number. Rome and
+      // Milan use two-digit area codes, most other cities three.
+      const area = /^0[26]/.test(national) ? national.slice(0, 2) : national.slice(0, 3);
+      return [area, ...chunkEvery(national.slice(area.length), 4)].join(' ').trim();
     }
     default:
       return chunkEvery(national, 3).join(' ');
@@ -435,13 +474,12 @@ export function formatPhoneNumber(
 
   if (format === 'international') return international;
 
-  // National form: keep the German convention of a leading zero, and use the
-  // country's usual trunk prefix where we know it.
-  const trunk = parsed.countryCode === '1' ? '' : '0';
   if (parsed.countryCode === '1' && parsed.national.length === 10) {
     const [area, exchange, line] = chunk(parsed.national, [3, 3, 4]);
     return `(${area}) ${exchange}-${line}`;
   }
+
+  const trunk = ZERO_TRUNK_CODES.has(parsed.countryCode) ? '0' : '';
   return `${trunk}${groups}`.trim();
 }
 

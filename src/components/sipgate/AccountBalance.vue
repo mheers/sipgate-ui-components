@@ -2,8 +2,8 @@
 import { computed } from 'vue';
 import Badge from '../ui/Badge.vue';
 import Skeleton from '../ui/Skeleton.vue';
-import { cn } from '@/lib/cn';
-import { formatCurrency } from '@/lib/format';
+import { cn } from '../../lib/cn';
+import { formatCurrency } from '../../lib/format';
 
 const props = withDefaults(
   defineProps<{
@@ -35,6 +35,7 @@ const formatted = computed(() => formatCurrency(props.amount, props.currency, pr
         props.class,
       )
     "
+    :aria-busy="loading || undefined"
   >
     <div class="flex items-start justify-between gap-3">
       <div class="flex items-center gap-2">
@@ -53,6 +54,7 @@ const formatted = computed(() => formatCurrency(props.amount, props.currency, pr
 
     <div class="mt-5">
       <Skeleton v-if="loading" rounded="md" class="h-9 w-40 bg-sg-inverse-foreground/15" />
+      <span v-if="loading" class="sr-only" role="status">Loading balance</span>
       <p
         v-else
         class="font-sg-display text-[2rem] leading-none font-semibold tracking-[-0.035em] tabular-nums"

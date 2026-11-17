@@ -2,8 +2,8 @@
 import { computed } from 'vue';
 import { Check, Copy } from 'lucide-vue-next';
 import Button from './Button.vue';
-import { useClipboard } from '@/composables/useClipboard';
-import { cn } from '@/lib/cn';
+import { useClipboard } from '../../composables/useClipboard';
+import { cn } from '../../lib/cn';
 
 const props = withDefaults(
   defineProps<{

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, useAttrs } from 'vue';
-import { cn } from '@/lib/cn';
+import { cn } from '../../lib/cn';
 
 defineOptions({ inheritAttrs: false });
 
@@ -59,7 +59,7 @@ const rootClasses = computed(() =>
       v-bind="inputAttrs"
       :class="
         cn(
-          'h-full w-full min-w-0 border-0 bg-transparent text-sm text-sg-foreground outline-none',
+          'h-full w-full min-w-0 border-0 bg-transparent text-sg-foreground outline-none',
           'placeholder:text-sg-subtle-foreground disabled:cursor-not-allowed',
         )
       "

@@ -52,6 +52,15 @@ describe('dates', () => {
     );
   });
 
+  it('adds the year once a relative date is from another year', () => {
+    expect(formatRelativeTime(new Date('2025-11-10T09:00:00Z'), { now, locale: 'en' })).toMatch(
+      /2025/,
+    );
+    expect(formatRelativeTime(new Date('2026-11-10T09:00:00Z'), { now, locale: 'en' })).not.toMatch(
+      /2026/,
+    );
+  });
+
   it('formats times and dates', () => {
     const local = new Date(2026, 10, 17, 14, 32);
     expect(formatTime(local, 'en-GB')).toBe('14:32');

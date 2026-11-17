@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import {
   ArrowRightLeft,
   Bell,
@@ -55,7 +55,41 @@ import {
   voicemail,
 } from '@/storybook/data';
 
-const dark = ref(false);
+const dark = ref(
+  typeof document !== 'undefined' && document.documentElement.classList.contains('sg-dark'),
+);
+let themeObserver: MutationObserver | undefined;
+let previousDark: boolean | null = null;
+
+function syncThemeFromDocument() {
+  if (typeof document === 'undefined') return;
+  dark.value = document.documentElement.classList.contains('sg-dark');
+}
+
+onMounted(() => {
+  if (typeof document === 'undefined' || typeof MutationObserver === 'undefined') return;
+  previousDark = document.documentElement.classList.contains('sg-dark');
+  syncThemeFromDocument();
+  themeObserver = new MutationObserver(syncThemeFromDocument);
+  themeObserver.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['class'],
+  });
+});
+
+onBeforeUnmount(() => {
+  themeObserver?.disconnect();
+  if (typeof document !== 'undefined' && previousDark !== null) {
+    document.documentElement.classList.toggle('sg-dark', previousDark);
+  }
+});
+
+watch(dark, (value) => {
+  if (typeof document === 'undefined') return;
+  // The theme lives on <html> so portalled dialogs and tooltips inherit it.
+  document.documentElement.classList.toggle('sg-dark', value);
+});
+
 const activeNav = ref('Overview');
 const navigation = [
   { label: 'Overview', icon: LayoutDashboard },
@@ -84,21 +118,41 @@ const today = computed(() =>
 // ---- Call state ----------------------------------------------------------
 const callActive = ref(true);
 const callStartedAt = ref(activeCall.startedAt);
+const callName = ref(activeCall.name);
+const callNumber = ref(activeCall.number);
+const callDirection = ref<'inbound' | 'outbound'>(activeCall.direction);
 const muted = ref(false);
 const held = ref(false);
 const callDialogOpen = ref(false);
 const callTarget = ref('+49 151 23456789');
 
-function startCall() {
+function resolveContactName(number: string): string {
+  const digits = number.replace(/\D/g, '');
+  return (
+    contactList.value.find((contact) =>
+      contact.numbers?.some((candidate) => candidate.replace(/\D/g, '') === digits),
+    )?.name ?? ''
+  );
+}
+
+function startCall(number = callTarget.value) {
+  callNumber.value = number;
+  callName.value = resolveContactName(number);
+  callDirection.value = 'outbound';
   callStartedAt.value = new Date();
   muted.value = false;
   held.value = false;
   callActive.value = true;
   callDialogOpen.value = false;
+  historyDialogOpen.value = false;
 }
 
 function endCall() {
   callActive.value = false;
+}
+
+function callBack(entry: HistoryEntry) {
+  startCall(entry.number);
 }
 
 // ---- History -------------------------------------------------------------
@@ -133,7 +187,10 @@ const recipient = ref('+4915123456789');
 const sentNotice = ref('');
 
 function focusComposer() {
-  composer.value?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  const element = composer.value;
+  if (!element) return;
+  element.querySelector('textarea')?.focus({ preventScroll: true });
+  element.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function useRecipient(contact: Contact) {
@@ -148,9 +205,12 @@ function sendMessage(payload: { message: string; recipient: string }) {
 </script>
 
 <template>
-  <div :class="['sg-root flex min-h-dvh bg-sg-background text-sg-foreground', dark && 'sg-dark']">
+  <div class="sg-root flex min-h-dvh bg-sg-background text-sg-foreground">
     <!-- Sidebar ---------------------------------------------------------- -->
-    <aside class="hidden w-60 shrink-0 flex-col border-r border-sg-border bg-sg-surface lg:flex">
+    <aside
+      class="hidden w-60 shrink-0 flex-col border-r border-sg-border bg-sg-surface lg:flex"
+      aria-label="Workspace"
+    >
       <div class="flex items-center gap-2.5 px-5 pt-5 pb-4">
         <span class="text-sg-primary"><SignalMark :size="24" /></span>
         <div>
@@ -231,10 +291,13 @@ function sendMessage(payload: { message: string; recipient: string }) {
           <button
             type="button"
             class="relative inline-flex size-8 items-center justify-center rounded-sg-sm text-sg-muted-foreground transition-colors outline-none hover:bg-sg-surface-muted hover:text-sg-foreground focus-visible:ring-2 focus-visible:ring-sg-ring"
-            aria-label="Notifications"
+            aria-label="Notifications, unread"
           >
             <Bell class="size-4" aria-hidden="true" />
-            <span class="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-sg-accent" />
+            <span
+              class="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-sg-accent"
+              aria-hidden="true"
+            />
           </button>
           <Button
             variant="outline"
@@ -282,9 +345,9 @@ function sendMessage(payload: { message: string; recipient: string }) {
           <div class="min-w-0 space-y-6">
             <ActiveCallCard
               v-if="callActive"
-              :name="activeCall.name"
-              :number="activeCall.number"
-              :direction="activeCall.direction"
+              :name="callName || undefined"
+              :number="callNumber"
+              :direction="callDirection"
               :state="held ? 'held' : 'active'"
               :started-at="callStartedAt"
               :muted="muted"
@@ -308,10 +371,10 @@ function sendMessage(payload: { message: string; recipient: string }) {
             <EmptyState
               v-else
               title="Call ended"
-              description="The conversation with Anna de Vries was saved to your history with the recording and notes."
+              :description="`The conversation with ${callName || callNumber} was saved to your history with the recording and notes.`"
               compact
             >
-              <Button size="sm" @click="startCall">Call Anna again</Button>
+              <Button size="sm" @click="startCall(activeCall.number)">Call Anna again</Button>
             </EmptyState>
 
             <section
@@ -367,7 +430,7 @@ function sendMessage(payload: { message: string; recipient: string }) {
           </div>
 
           <!-- Rail ------------------------------------------------------ -->
-          <aside class="space-y-6">
+          <aside class="space-y-6" aria-label="Account overview">
             <AccountBalance
               :amount="42.8"
               account-name="Marcel Heers · sipgate basic"
@@ -387,7 +450,7 @@ function sendMessage(payload: { message: string; recipient: string }) {
                 <h2 class="font-sg-display text-sm font-semibold tracking-[-0.01em]">Contacts</h2>
                 <Button variant="ghost" size="icon-sm" aria-label="Add contact"><Plus /></Button>
               </div>
-              <ul class="px-2 pb-2">
+              <ul class="m-0 list-none px-2 pb-2">
                 <li v-for="contact in contactList.slice(0, 3)" :key="contact.id">
                   <ContactListItem
                     :contact="contact"
@@ -416,7 +479,7 @@ function sendMessage(payload: { message: string; recipient: string }) {
                   >{{ devices.filter((device) => device.status === 'online').length }} online</Badge
                 >
               </div>
-              <ul class="space-y-1 px-2 pb-2">
+              <ul class="m-0 list-none space-y-1 px-2 pb-2">
                 <li
                   v-for="device in devices.slice(0, 3)"
                   :key="device.id"
@@ -465,7 +528,7 @@ function sendMessage(payload: { message: string; recipient: string }) {
           <DialogClose as-child>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
-          <Button @click="startCall"><Phone /> Call now</Button>
+          <Button @click="startCall(callTarget)"><Phone /> Call now</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -501,7 +564,7 @@ function sendMessage(payload: { message: string; recipient: string }) {
           <DialogClose as-child>
             <Button variant="outline">Close</Button>
           </DialogClose>
-          <Button><Phone /> Call back</Button>
+          <Button @click="callBack(selectedEntry)"><Phone /> Call back</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

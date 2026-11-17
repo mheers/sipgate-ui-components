@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { Settings2 } from 'lucide-vue-next';
 import Button from '../ui/Button.vue';
 import DeviceCard from './DeviceCard.vue';
-import { devices } from '@/storybook/data';
+import { devices } from '../../storybook/data';
 
 const meta = {
   title: 'sipgate/DeviceCard',

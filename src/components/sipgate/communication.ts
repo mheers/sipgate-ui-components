@@ -7,7 +7,7 @@ import {
   Printer,
   Voicemail,
 } from 'lucide-vue-next';
-import type { CommunicationDirection, CommunicationType } from '@/lib/types';
+import type { CommunicationDirection, CommunicationType } from '../../lib/types';
 
 export type CommunicationTone = 'primary' | 'success' | 'danger' | 'info' | 'warning' | 'neutral';
 

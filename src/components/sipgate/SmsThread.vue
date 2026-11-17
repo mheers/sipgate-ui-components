@@ -4,9 +4,9 @@ import { MessageSquare } from 'lucide-vue-next';
 import EmptyState from '../ui/EmptyState.vue';
 import Skeleton from '../ui/Skeleton.vue';
 import SmsBubble from './SmsBubble.vue';
-import { cn } from '@/lib/cn';
-import { formatDayHeading, toDate } from '@/lib/format';
-import type { SmsMessage } from '@/lib/types';
+import { cn } from '../../lib/cn';
+import { formatDayHeading, toDate } from '../../lib/format';
+import type { SmsMessage } from '../../lib/types';
 
 const props = withDefaults(
   defineProps<{
@@ -69,7 +69,7 @@ function onScroll() {
 }
 
 watch(
-  () => [props.messages.length, props.typing],
+  () => [props.messages.length, props.messages[props.messages.length - 1]?.id, props.typing],
   async () => {
     if (!nearBottom.value) return;
     await nextTick();
@@ -100,6 +100,8 @@ defineExpose({ scrollToBottom });
       :style="{ maxHeight }"
       tabindex="0"
       role="log"
+      aria-live="polite"
+      aria-relevant="additions"
       :aria-label="scrollLabel"
       @scroll.passive="onScroll"
     >
@@ -127,7 +129,7 @@ defineExpose({ scrollToBottom });
         </template>
       </EmptyState>
 
-      <div v-else class="flex flex-col gap-3" aria-live="polite" aria-relevant="additions">
+      <div v-else class="flex flex-col gap-3">
         <template v-for="group in groups" :key="group.label">
           <div class="flex items-center gap-3 py-1">
             <span class="h-px flex-1 bg-sg-border" aria-hidden="true" />

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RadioTower } from 'lucide-vue-next';
-import { cn } from '@/lib/cn';
+import { cn } from '../../lib/cn';
 
 withDefaults(
   defineProps<{

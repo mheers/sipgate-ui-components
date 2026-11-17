@@ -1,4 +1,4 @@
-import type { Contact, Device, HistoryEntry, SmsMessage } from '@/lib/types';
+import type { Contact, Device, HistoryEntry, SmsMessage } from '../lib/types';
 
 const now = Date.now();
 const minutesAgo = (minutes: number) => new Date(now - minutes * 60_000);

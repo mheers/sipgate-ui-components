@@ -105,7 +105,7 @@ export const Inverse: Story = {
       <Card v-bind="args" class="max-w-sm">
         <CardHeader>
           <CardTitle>Live call</CardTitle>
-          <CardDescription class="text-sg-inverse-foreground/65">Anna de Vries · 01:42</CardDescription>
+          <CardDescription>Anna de Vries · 01:42</CardDescription>
         </CardHeader>
         <CardContent>
           <p class="font-sg-mono text-2xl text-sg-accent">REC</p>

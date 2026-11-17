@@ -7,7 +7,7 @@ import CommunicationIcon from './CommunicationIcon.vue';
 import PhoneNumber from './PhoneNumber.vue';
 import Button from '../ui/Button.vue';
 import Card from '../ui/Card.vue';
-import { historyEntries } from '@/storybook/data';
+import { historyEntries } from '../../storybook/data';
 
 const meta = {
   title: 'sipgate/CallHistoryList',

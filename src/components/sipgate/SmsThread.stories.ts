@@ -4,7 +4,7 @@ import SmsThread from './SmsThread.vue';
 import SmsComposer from './SmsComposer.vue';
 import Avatar from '../ui/Avatar.vue';
 import ConnectionStatus from './ConnectionStatus.vue';
-import { smsThread } from '@/storybook/data';
+import { smsThread } from '../../storybook/data';
 
 const meta = {
   title: 'sipgate/SmsThread',

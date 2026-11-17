@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Separator, type SeparatorProps } from 'reka-ui';
-import { cn } from '@/lib/cn';
+import { cn } from '../../lib/cn';
 
 const props = withDefaults(defineProps<SeparatorProps & { class?: string }>(), {
   orientation: 'horizontal',

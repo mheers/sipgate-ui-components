@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { TabsTrigger, useForwardProps, type TabsTriggerProps } from 'reka-ui';
-import { cn } from '@/lib/cn';
-import { reactiveOmit } from '@/lib/reactiveOmit';
+import { cn } from '../../lib/cn';
+import { reactiveOmit } from '../../lib/reactiveOmit';
 
 const props = defineProps<TabsTriggerProps & { class?: string }>();
 const forwarded = useForwardProps(reactiveOmit(props, 'class'));

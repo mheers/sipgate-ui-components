@@ -6,10 +6,10 @@ import Badge from '../ui/Badge.vue';
 import Button from '../ui/Button.vue';
 import CallTimer from './CallTimer.vue';
 import CommunicationIcon from './CommunicationIcon.vue';
-import { formatPhoneNumber } from '@/lib/phone';
-import { cn } from '@/lib/cn';
-import type { CallState, CommunicationDirection } from '@/lib/types';
-import type { DateInput } from '@/lib/format';
+import { formatPhoneNumber } from '../../lib/phone';
+import { cn } from '../../lib/cn';
+import type { CallState, CommunicationDirection } from '../../lib/types';
+import type { DateInput } from '../../lib/format';
 
 const props = withDefaults(
   defineProps<{
@@ -122,7 +122,7 @@ const directionLabel = computed(() =>
           class="inline-flex items-center gap-2 rounded-full bg-sg-inverse-foreground/10 px-3 py-1.5 text-sm font-medium"
         >
           <span class="size-1.5 animate-sg-pulse rounded-full bg-sg-accent" aria-hidden="true" />
-          Ringing
+          {{ direction === 'outbound' ? 'Calling' : 'Ringing' }}
         </span>
       </div>
     </div>
@@ -131,14 +131,22 @@ const directionLabel = computed(() =>
       class="mt-5 flex flex-wrap items-center gap-2 border-t border-sg-inverse-foreground/12 pt-4"
     >
       <template v-if="state === 'ringing'">
-        <Button variant="accent" class="flex-1 sm:flex-none" @click="emit('answer')">
-          <Phone aria-hidden="true" />
-          Answer
-        </Button>
-        <Button variant="inverse-outline" class="flex-1 sm:flex-none" @click="emit('hangup')">
-          <PhoneOff aria-hidden="true" />
-          Decline
-        </Button>
+        <template v-if="direction === 'outbound'">
+          <Button variant="destructive" class="flex-1 sm:flex-none" @click="emit('hangup')">
+            <PhoneOff aria-hidden="true" />
+            Cancel call
+          </Button>
+        </template>
+        <template v-else>
+          <Button variant="accent" class="flex-1 sm:flex-none" @click="emit('answer')">
+            <Phone aria-hidden="true" />
+            Answer
+          </Button>
+          <Button variant="inverse-outline" class="flex-1 sm:flex-none" @click="emit('hangup')">
+            <PhoneOff aria-hidden="true" />
+            Decline
+          </Button>
+        </template>
       </template>
 
       <template v-else>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
-import { cn } from '@/lib/cn';
+import { cn } from '../../lib/cn';
 
 const props = withDefaults(
   defineProps<{

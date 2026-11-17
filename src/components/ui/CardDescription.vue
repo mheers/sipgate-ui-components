@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { cn } from '@/lib/cn';
+import { cn } from '../../lib/cn';
 
 defineProps<{ class?: string }>();
 </script>
 
 <template>
-  <p :class="cn('text-[0.8125rem] leading-relaxed text-sg-muted-foreground', $props.class)">
+  <p :class="cn('text-[0.8125rem] leading-relaxed text-current/70', $props.class)">
     <slot />
   </p>
 </template>

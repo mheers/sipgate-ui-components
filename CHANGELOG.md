@@ -27,4 +27,21 @@ The first public foundation.
 - **Quality** — TypeScript declarations, unit tests for formatting, SMS
   segmentation and key components, accessibility notes and keyboard maps.
 
+### Fixed
+
+- Phone numbers written with a national trunk prefix after the country code
+  (`+49 (0) 30…`, `0049 (0) 30…`), repeated plus signs and Italian leading
+  zeros now normalise correctly.
+- Type declarations no longer rely on the internal `@/` path alias, so the
+  package typechecks in a consumer without extra `paths` configuration.
+- The published stylesheet no longer emits Tailwind's global `--spacing`
+  variable (or any other generic theme variable).
+- Portalled dialogs and tooltips are documented to follow the document-level
+  dark theme; the example now themes `<html>` and the dialog follows it.
+- History lists no longer inherit browser list markers or indentation.
+- The SMS composer shows a focus ring and exposes its keyboard shortcut; a
+  loading button keeps its width instead of jumping.
+- An outgoing ringing call offers a single cancel action instead of
+  answer/decline, and history notes no longer squeeze the channel label.
+
 [0.1.0]: https://github.com/mheers/sipgate-ui-components/releases/tag/v0.1.0

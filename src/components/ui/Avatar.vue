@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { cn } from '@/lib/cn';
-import { avatarTone } from '@/lib/avatar';
-import { getInitials } from '@/lib/format';
+import { cn } from '../../lib/cn';
+import { avatarTone } from '../../lib/avatar';
+import { getInitials } from '../../lib/format';
 
 const props = withDefaults(
   defineProps<{
@@ -43,6 +43,19 @@ const statusColors = {
   away: 'bg-sg-warning',
 } as const;
 
+const statusLabels = {
+  online: 'online',
+  offline: 'offline',
+  busy: 'busy',
+  away: 'away',
+} as const;
+
+const accessibleLabel = computed(() => {
+  if (props.decorative) return undefined;
+  const base = props.name || 'Avatar';
+  return props.status ? `${base}, ${statusLabels[props.status]}` : base;
+});
+
 const rootClasses = computed(() =>
   cn(
     'relative inline-flex shrink-0 items-center justify-center overflow-visible',
@@ -57,7 +70,7 @@ const rootClasses = computed(() =>
   <span
     :class="rootClasses"
     :role="decorative ? undefined : 'img'"
-    :aria-label="decorative ? undefined : name || undefined"
+    :aria-label="accessibleLabel"
     :aria-hidden="decorative || undefined"
   >
     <span
@@ -90,6 +103,7 @@ const rootClasses = computed(() =>
         )
       "
       :title="status"
+      aria-hidden="true"
     />
   </span>
 </template>

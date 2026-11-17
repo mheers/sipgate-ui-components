@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { Check, CheckCheck, CircleAlert, Clock3 } from 'lucide-vue-next';
-import { cn } from '@/lib/cn';
-import { formatTime, toDate } from '@/lib/format';
-import type { SmsMessage } from '@/lib/types';
+import { cn } from '../../lib/cn';
+import { formatTime, toDate } from '../../lib/format';
+import type { SmsMessage } from '../../lib/types';
 
 const props = withDefaults(
   defineProps<{

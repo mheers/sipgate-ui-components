@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { cn } from '@/lib/cn';
+import { cn } from '../../lib/cn';
 
 defineProps<{ class?: string }>();
 </script>
@@ -8,7 +8,7 @@ defineProps<{ class?: string }>();
   <h3
     :class="
       cn(
-        'font-sg-display text-[0.9375rem] font-semibold tracking-[-0.01em] text-sg-foreground',
+        'font-sg-display text-[0.9375rem] font-semibold tracking-[-0.01em] text-inherit',
         $props.class,
       )
     "

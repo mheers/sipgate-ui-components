@@ -22,7 +22,7 @@ Open http://localhost:5173.
 - A live `ActiveCallCard` with ticking timer, recording, mute, hold and hangup.
 - `CallHistoryList` grouped by day, filtered to missed calls, with a `Dialog` detail view.
 - `ContactListItem` favourites that become the SMS recipient.
-- `SmsComposer` with recipient validation, live segment counting and send feedback.
+- `SmsComposer` with a required recipient, live segment counting and send feedback.
 - `AccountBalance`, `VoicemailPlayer`, device presence and realtime connection state.
 - A theme toggle that flips the same component tree between light and dark.
 - A responsive layout: sidebar on desktop, single column on mobile.
@@ -34,20 +34,30 @@ reflects the current components:
 
 ```ts
 resolve: {
-  alias: {
-    '@mheers/sipgate-ui-components': fileURLToPath(new URL('../../src/index.ts', import.meta.url)),
-  },
-},
+  alias: [
+    {
+      find: /^@mheers\/sipgate-ui-components$/,
+      replacement: fileURLToPath(new URL('../../src/index.ts', import.meta.url)),
+    },
+  ],
+}
 ```
 
-`src/demo.css` imports the library stylesheet and adds the source directory as a Tailwind
-scan target:
+`pnpm example:build:dist` sets `SG_USE_DIST=1`, which points the same alias at
+`dist/index.js` and the stylesheet import at `dist/style.css`. That is the release check for
+missing exports and compiled styles.
+
+`src/demo.css` imports the library stylesheet through the package alias and adds the source
+directory as a Tailwind scan target:
 
 ```css
-@import '../../../src/styles/index.css';
+@import '@mheers/sipgate-ui-components/style.css';
 
 @source '../../../src';
 ```
+
+The dist build swaps in `src/demo-dist.css`, which imports the already-compiled stylesheet
+without a second Tailwind scan.
 
 A real application would instead depend on the published package:
 

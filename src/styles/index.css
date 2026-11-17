@@ -12,8 +12,9 @@
 /*
  * Only the utilities are imported. Tailwind's theme layer is deliberately not
  * shipped: its :root defaults would override the host application's theme.
- * The handful of generic variables the generated utilities need are declared
- * inside `.sg-root` below instead.
+ * `reference inline` in the @theme block below keeps the theme available for
+ * class generation while emitting no generic variables; the values land
+ * directly in the utilities.
  */
 @import 'tailwindcss/utilities.css' layer(utilities);
 
@@ -128,7 +129,7 @@
   --sg-shadow-lg: 0 32px 64px -28px rgb(0 0 0 / 0.8), 0 4px 12px -6px rgb(0 0 0 / 0.45);
 }
 
-@theme inline {
+@theme reference inline {
   /* Generic Tailwind defaults, inlined so the published CSS never emits
    * global --font-sans/--spacing/etc. that could override the host theme. */
   --spacing: 0.25rem;
@@ -221,6 +222,7 @@
   --animate-sg-pulse: sg-pulse 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-sg-shimmer: sg-shimmer 1.6s ease-in-out infinite;
   --animate-sg-enter: sg-enter 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-sg-fade: sg-fade 0.16s ease-out;
   --animate-sg-spin: sg-spin 0.8s linear infinite;
   --animate-sg-bounce: sg-bounce 1s infinite;
 }
@@ -252,6 +254,15 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes sg-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
@@ -356,8 +367,12 @@
 
 /* Respect the system preference for the library's own decorative motion. */
 @media (prefers-reduced-motion: reduce) {
+  /* Match both the plain utility and variant classes such as
+   * `data-[state=open]:animate-sg-enter`. */
+  [class*='animate-sg-enter'],
+  [class*='animate-sg-fade'],
+  [class*='animate-sg-bounce'],
   .animate-sg-pulse,
-  .animate-sg-enter,
   .animate-sg-shimmer {
     animation: none !important;
   }

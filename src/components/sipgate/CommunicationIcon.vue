@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { cn } from '@/lib/cn';
-import type { CommunicationDirection, CommunicationType } from '@/lib/types';
+import { cn } from '../../lib/cn';
+import type { CommunicationDirection, CommunicationType } from '../../lib/types';
 import { communicationToneClasses, describeCommunication } from './communication';
 
 const props = withDefaults(

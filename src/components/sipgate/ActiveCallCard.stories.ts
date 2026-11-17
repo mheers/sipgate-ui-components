@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { fn } from 'storybook/test';
 import ActiveCallCard from './ActiveCallCard.vue';
-import { activeCall } from '@/storybook/data';
+import { activeCall } from '../../storybook/data';
 
 const meta = {
   title: 'sipgate/ActiveCallCard',

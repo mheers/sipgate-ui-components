@@ -15,6 +15,31 @@ describe('parsePhoneNumber', () => {
     expect(parsePhoneNumber('(030) 12345678')?.e164).toBe('+493012345678');
   });
 
+  it('drops a national trunk prefix after the country code', () => {
+    for (const input of [
+      '+49 (0) 30 12345678',
+      '0049 (0) 30 12345678',
+      '+49 030 12345678',
+      '49 (0) 30 12345678',
+    ]) {
+      expect(parsePhoneNumber(input)?.e164).toBe('+493012345678');
+    }
+  });
+
+  it('survives repeated plus signs and stray zeros', () => {
+    expect(parsePhoneNumber('++49 30 12345678')?.e164).toBe('+493012345678');
+    expect(parsePhoneNumber('+0049 30 12345678')?.e164).toBe('+493012345678');
+    expect(parsePhoneNumber('00049 30 12345678')?.e164).toBe('+493012345678');
+    expect(parsePhoneNumber('tel:+49-30-12345678')?.e164).toBe('+493012345678');
+    expect(parsePhoneNumber('+')).toBeNull();
+    expect(parsePhoneNumber('++')).toBeNull();
+  });
+
+  it('keeps the Italian leading zero', () => {
+    expect(parsePhoneNumber('+39 06 1234 5678')?.e164).toBe('+390612345678');
+    expect(parsePhoneNumber('+39 06 1234 5678')?.national).toBe('0612345678');
+  });
+
   it('respects another default country', () => {
     expect(parsePhoneNumber('(415) 555-1234', 'US')?.e164).toBe('+14155551234');
   });
@@ -41,6 +66,7 @@ describe('formatPhoneNumber', () => {
 
   it('formats national numbers with the German trunk prefix', () => {
     expect(formatPhoneNumber('+49 30 12345678', { format: 'national' })).toBe('030 1234 5678');
+    expect(formatPhoneNumber('+49 (0) 30 12345678', { format: 'national' })).toBe('030 1234 5678');
   });
 
   it('formats US numbers', () => {
@@ -48,6 +74,13 @@ describe('formatPhoneNumber', () => {
     expect(formatPhoneNumber('+14155551234', { format: 'national', country: 'US' })).toBe(
       '(415) 555-1234',
     );
+  });
+
+  it('formats French and Italian numbers without inventing a trunk zero', () => {
+    expect(formatPhoneNumber('+33 6 12 34 56 78')).toBe('+33 6 12 34 56 78');
+    expect(formatPhoneNumber('+33 6 12 34 56 78', { format: 'national' })).toBe('06 12 34 56 78');
+    expect(formatPhoneNumber('+39 06 1234 5678', { format: 'national' })).toBe('06 1234 5678');
+    expect(formatPhoneNumber('+34 612 345 678', { format: 'national' })).toBe('612 345 678');
   });
 
   it('formats UK and Swiss numbers', () => {

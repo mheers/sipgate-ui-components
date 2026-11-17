@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import CopyButton from '../ui/CopyButton.vue';
-import { cn } from '@/lib/cn';
-import { formatPhoneNumber, telHref } from '@/lib/phone';
-import type { PhoneNumberFormat } from '@/lib/types';
+import { cn } from '../../lib/cn';
+import { formatPhoneNumber, telHref } from '../../lib/phone';
+import type { PhoneNumberFormat } from '../../lib/types';
 
 const props = withDefaults(
   defineProps<{
@@ -34,6 +34,7 @@ const display = computed(() =>
   formatPhoneNumber(props.value, { format: props.format, country: props.country }),
 );
 const href = computed(() => telHref(props.value, props.country));
+const linked = computed(() => props.link && Boolean(href.value));
 
 const sizes = {
   sm: 'text-xs',
@@ -51,16 +52,16 @@ const tones = {
 <template>
   <span :class="cn('group/phone inline-flex min-w-0 items-center gap-1', $props.class)">
     <component
-      :is="link ? 'a' : 'span'"
-      :href="link ? href : undefined"
-      :aria-label="link ? `${callLabel} ${display}` : undefined"
+      :is="linked ? 'a' : 'span'"
+      :href="linked ? href : undefined"
+      :aria-label="linked ? `${callLabel} ${display}` : undefined"
       :class="
         cn(
           'truncate rounded-sg-sm transition-colors outline-none',
           mono && 'sg-numeric',
           sizes[size],
           tones[tone],
-          link &&
+          linked &&
             'hover:underline hover:underline-offset-2 focus-visible:ring-2 focus-visible:ring-sg-ring',
         )
       "

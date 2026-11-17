@@ -4,10 +4,10 @@ import { Disc3 } from 'lucide-vue-next';
 import CommunicationIcon from './CommunicationIcon.vue';
 import PhoneNumber from './PhoneNumber.vue';
 import { describeCommunication } from './communication';
-import { cn } from '@/lib/cn';
-import { formatDuration, formatRelativeTime, formatTime, toDate } from '@/lib/format';
-import { formatPhoneNumber } from '@/lib/phone';
-import type { HistoryEntry } from '@/lib/types';
+import { cn } from '../../lib/cn';
+import { formatDuration, formatRelativeTime, formatTime, toDate } from '../../lib/format';
+import { formatPhoneNumber } from '../../lib/phone';
+import type { HistoryEntry } from '../../lib/types';
 
 const props = withDefaults(
   defineProps<{
@@ -57,6 +57,7 @@ const detail = computed(() => {
   if (props.entry.durationSeconds !== undefined) {
     parts.push(formatDuration(props.entry.durationSeconds));
   }
+  if (props.entry.note) parts.push(props.entry.note);
   return parts.join(' · ');
 });
 </script>
@@ -93,13 +94,15 @@ const detail = computed(() => {
           <span
             v-if="entry.unread"
             class="size-1.5 shrink-0 rounded-full bg-sg-primary"
-            aria-label="Unread"
+            aria-hidden="true"
           />
+          <span v-if="entry.unread" class="sr-only">Unread</span>
           <Disc3
             v-if="entry.recording"
             class="size-3.5 shrink-0 text-sg-muted-foreground"
-            aria-label="Recorded"
+            aria-hidden="true"
           />
+          <span v-if="entry.recording" class="sr-only">Recorded</span>
         </div>
         <div class="mt-1 flex min-w-0 items-center gap-1.5 text-xs text-sg-muted-foreground">
           <template v-if="entry.name">
@@ -109,16 +112,12 @@ const detail = computed(() => {
               size="sm"
               tone="muted"
               :link="false"
-              class="min-w-0 shrink-0"
+              class="hidden min-w-0 shrink-0 sm:inline-flex"
             />
-            <span class="text-sg-border-strong" aria-hidden="true">·</span>
+            <span class="hidden text-sg-border-strong sm:inline" aria-hidden="true">·</span>
             <span class="truncate">{{ detail }}</span>
           </template>
           <span v-else class="truncate">{{ detail }}</span>
-          <template v-if="entry.note">
-            <span class="text-sg-border-strong" aria-hidden="true">·</span>
-            <span class="truncate">{{ entry.note }}</span>
-          </template>
         </div>
       </div>
 
@@ -134,7 +133,7 @@ const detail = computed(() => {
 
     <div
       v-if="$slots.actions"
-      class="flex shrink-0 items-center opacity-0 transition-opacity group-hover/item:opacity-100 focus-within:opacity-100"
+      class="flex shrink-0 items-center opacity-100 transition-opacity focus-within:opacity-100 sm:opacity-0 sm:group-hover/item:opacity-100"
     >
       <slot name="actions" />
     </div>

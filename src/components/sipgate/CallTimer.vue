@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useCallDuration } from '@/composables/useCallDuration';
-import { cn } from '@/lib/cn';
-import { formatDuration, formatDurationWords, type DateInput } from '@/lib/format';
+import { useCallDuration } from '../../composables/useCallDuration';
+import { cn } from '../../lib/cn';
+import { formatDuration, formatDurationWords, type DateInput } from '../../lib/format';
 
 const props = withDefaults(
   defineProps<{
@@ -17,7 +17,9 @@ const props = withDefaults(
   { live: true, size: 'md', tone: 'default', locale: 'en-GB' },
 );
 
-const { seconds: elapsed } = useCallDuration(() => (props.live ? (props.startedAt ?? null) : null));
+const { seconds: elapsed } = useCallDuration(() =>
+  props.live && props.seconds === undefined ? (props.startedAt ?? null) : null,
+);
 
 const totalSeconds = computed(() =>
   props.seconds !== undefined ? Math.max(0, Math.floor(props.seconds)) : elapsed.value,

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { fn } from 'storybook/test';
 import ContactListItem from './ContactListItem.vue';
-import { contacts } from '@/storybook/data';
+import { contacts } from '../../storybook/data';
 
 const meta = {
   title: 'sipgate/ContactListItem',
@@ -37,6 +37,10 @@ export const Default: Story = {};
 
 export const Selected: Story = {
   args: { selected: true },
+};
+
+export const WithoutFavoriteControl: Story = {
+  args: { showFavorite: false },
 };
 
 export const WithoutPhoneNumber: Story = {

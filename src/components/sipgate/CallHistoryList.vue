@@ -4,9 +4,9 @@ import { Phone } from 'lucide-vue-next';
 import CallHistoryItem from './CallHistoryItem.vue';
 import EmptyState from '../ui/EmptyState.vue';
 import Skeleton from '../ui/Skeleton.vue';
-import { cn } from '@/lib/cn';
-import { formatDayHeading, toDate } from '@/lib/format';
-import type { HistoryEntry } from '@/lib/types';
+import { cn } from '../../lib/cn';
+import { formatDayHeading, toDate } from '../../lib/format';
+import type { HistoryEntry } from '../../lib/types';
 
 const props = withDefaults(
   defineProps<{
@@ -97,7 +97,7 @@ const groups = computed(() => {
         >
           {{ group.label }}
         </h3>
-        <ul class="flex flex-col">
+        <ul class="m-0 flex list-none flex-col p-0">
           <li v-for="entry in group.entries" :key="entry.id">
             <slot name="item" :entry="entry" :select="selectEntry">
               <CallHistoryItem

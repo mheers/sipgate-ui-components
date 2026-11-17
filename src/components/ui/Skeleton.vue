@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { cn } from '@/lib/cn';
+import { cn } from '../../lib/cn';
 
 const props = withDefaults(
   defineProps<{
@@ -11,7 +11,7 @@ const props = withDefaults(
 );
 
 const radii = {
-  sm: 'rounded-sg-sm',
+  sm: 'rounded-sm',
   md: 'rounded-sg-sm',
   lg: 'rounded-sg',
   full: 'rounded-full',

@@ -40,7 +40,7 @@ This library centralises the answers:
   keyboard paths for tabs, dialogs and the voicemail scrubber, and reduced-motion support.
 - **Quiet, distinctive design.** Warm paper, ink, sipgate violet for action, and a single
   acid-lime signal reserved for genuinely live audio.
-- **Yours to theme.** Every value is a prefixed `--sg-*` token. Light and dark themes, a
+- **Yours to theme.** Every theme value is a prefixed `--sg-*` token. Light and dark themes, a
   scoped reset, and no collision with an existing shadcn/Tailwind theme.
 - **Documented.** Storybook pages with props, states, accessibility notes and a complete
   cockpit composition.
@@ -75,6 +75,7 @@ import {
 
 const muted = ref(false);
 const held = ref(false);
+const startedAt = new Date();
 const message = ref('');
 const recipient = ref('+4915123456789');
 const history = ref<HistoryEntry[]>([]);
@@ -97,7 +98,7 @@ function sendSms(payload: { message: string; recipient: string }) {
     <ActiveCallCard
       name="Anna de Vries"
       number="+49 151 23456789"
-      :started-at="new Date()"
+      :started-at="startedAt"
       :state="held ? 'held' : 'active'"
       :muted="muted"
       :recording="true"
@@ -113,7 +114,9 @@ function sendSms(payload: { message: string; recipient: string }) {
 </template>
 ```
 
-Add `sg-dark` to the same element, or to `<html>`, for the dark theme:
+Add `sg-dark` to `<html>` for the dark theme, so dialogs and tooltips rendered in a portal
+inherit it too. A wrapper-level `sg-dark` still themes inline components, but portalled
+overlays live under `<body>` and only see the document-level theme:
 
 ```html
 <html class="sg-dark">
@@ -134,29 +137,31 @@ pnpm add ../sipgate-ui-components/mheers-sipgate-ui-components-0.1.0.tgz
 
 ## Components
 
-All components live in [`src/components`](./src/components) and have a Storybook page.
+All components live in [`src/components`](./src/components). Every top-level component has a
+Storybook page; compound subcomponents such as `CardHeader` and `DialogFooter` are documented
+with their parent.
 
 ### Primitives
 
-| Component                                          | What it does                                                                               |
-| -------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| [`Button`](./src/components/ui/Button.vue)         | Seven intents including inverse variants for dark call surfaces, six sizes, loading state. |
-| [`Input`](./src/components/ui/Input.vue)           | Single-line field with leading/trailing slots and invalid/disabled states.                 |
-| [`Textarea`](./src/components/ui/Textarea.vue)     | Multi-line text with optional auto-resize.                                                 |
-| [`Label`](./src/components/ui/Label.vue)           | Compact form label with a required marker.                                                 |
-| [`Badge`](./src/components/ui/Badge.vue)           | Pill label in eight tones, optional presence dot.                                          |
-| [`Card`](./src/components/ui/Card.vue)             | Surface plus `CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, `CardFooter`.    |
-| [`Avatar`](./src/components/ui/Avatar.vue)         | Stable initials, five sizes, presence dot, image fallback.                                 |
-| [`Tabs`](./src/components/ui/Tabs.vue)             | reka-ui segmented control with roving focus.                                               |
-| [`Switch`](./src/components/ui/Switch.vue)         | Labelled binary setting with description.                                                  |
-| [`Tooltip`](./src/components/ui/Tooltip.vue)       | Hover/focus explanation with a portal.                                                     |
-| [`Dialog`](./src/components/ui/Dialog.vue)         | Focus-trapped modal with title, description, footer and close button.                      |
-| [`Spinner`](./src/components/ui/Spinner.vue)       | Indeterminate progress with a hidden status label.                                         |
-| [`Skeleton`](./src/components/ui/Skeleton.vue)     | Shimmering placeholder that honours reduced motion.                                        |
-| [`Separator`](./src/components/ui/Separator.vue)   | Horizontal or vertical hairline.                                                           |
-| [`EmptyState`](./src/components/ui/EmptyState.vue) | Dotted-paper empty state with an action slot.                                              |
-| [`CopyButton`](./src/components/ui/CopyButton.vue) | Copy with check state and a live-region announcement.                                      |
-| [`PageHeader`](./src/components/ui/PageHeader.vue) | Eyebrow, display title, description, actions and metadata.                                 |
+| Component                                          | What it does                                                                             |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| [`Button`](./src/components/ui/Button.vue)         | Ten intents including inverse variants for dark call surfaces, six sizes, loading state. |
+| [`Input`](./src/components/ui/Input.vue)           | Single-line field with leading/trailing slots and invalid/disabled states.               |
+| [`Textarea`](./src/components/ui/Textarea.vue)     | Multi-line text with optional auto-resize.                                               |
+| [`Label`](./src/components/ui/Label.vue)           | Compact form label with a required marker.                                               |
+| [`Badge`](./src/components/ui/Badge.vue)           | Pill label in eight tones, optional presence dot.                                        |
+| [`Card`](./src/components/ui/Card.vue)             | Surface plus `CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, `CardFooter`.  |
+| [`Avatar`](./src/components/ui/Avatar.vue)         | Stable initials, five sizes, presence dot, image fallback.                               |
+| [`Tabs`](./src/components/ui/Tabs.vue)             | reka-ui segmented control with roving focus.                                             |
+| [`Switch`](./src/components/ui/Switch.vue)         | Labelled binary setting with description.                                                |
+| [`Tooltip`](./src/components/ui/Tooltip.vue)       | Hover/focus explanation with a portal.                                                   |
+| [`Dialog`](./src/components/ui/Dialog.vue)         | Focus-trapped modal with title, description, footer and close button.                    |
+| [`Spinner`](./src/components/ui/Spinner.vue)       | Indeterminate progress with a hidden status label.                                       |
+| [`Skeleton`](./src/components/ui/Skeleton.vue)     | Shimmering placeholder that honours reduced motion.                                      |
+| [`Separator`](./src/components/ui/Separator.vue)   | Horizontal or vertical hairline.                                                         |
+| [`EmptyState`](./src/components/ui/EmptyState.vue) | Dotted-paper empty state with an action slot.                                            |
+| [`CopyButton`](./src/components/ui/CopyButton.vue) | Copy with check state and a live-region announcement.                                    |
+| [`PageHeader`](./src/components/ui/PageHeader.vue) | Eyebrow, display title, description, actions and metadata.                               |
 
 ### sipgate domain
 
@@ -192,7 +197,8 @@ All components live in [`src/components`](./src/components) and have a Storybook
 | [`formatDuration` / `formatDurationWords`](./src/lib/format.ts)  | Clock (`1:02:05`) and localised human durations.                         |
 | [`formatRelativeTime` / `formatDayHeading`](./src/lib/format.ts) | “5 minutes ago”, “Today”, “Yesterday”.                                   |
 | [`formatCurrency`](./src/lib/format.ts)                          | Locale-aware money for account credit.                                   |
-| [`getInitials` / `avatarTone`](./src/lib/format.ts)              | Deterministic avatar labels and colours.                                 |
+| [`getInitials`](./src/lib/format.ts)                             | Deterministic initials from names, emails and single words.              |
+| [`avatarTone`](./src/lib/avatar.ts)                              | Stable, AA-contrast avatar colours derived from a name.                  |
 | [`cn`](./src/lib/cn.ts)                                          | `clsx` + `tailwind-merge` helper used by every component.                |
 
 ## The details that matter
@@ -358,6 +364,7 @@ true consumer example.
 | ----------------------------------- | ------------------------------------------------------- |
 | `pnpm dev`                          | Storybook on port 6006                                  |
 | `pnpm example:dev`                  | Cockpit example on port 5173                            |
+| `pnpm example:build:dist`           | Cockpit against the compiled package (release check)    |
 | `pnpm build`                        | ES bundle, `style.css` and `.d.ts` declarations         |
 | `pnpm build:storybook`              | Static Storybook in `storybook-static/`                 |
 | `pnpm typecheck`                    | `vue-tsc` over source, stories, configs and the example |
@@ -373,7 +380,7 @@ There is intentionally **no CI**. Releases are a local, reviewed step — see
 ## Compatibility
 
 - Vue `^3.5`
-- Modern evergreen browsers (custom properties, `oklch`, `color-mix`)
+- Modern evergreen browsers (custom properties, `color-mix`)
 - No Tailwind installation required in the host app; the published stylesheet is compiled
 - Works next to an existing shadcn theme thanks to the `sg` token prefix and scoped reset
 

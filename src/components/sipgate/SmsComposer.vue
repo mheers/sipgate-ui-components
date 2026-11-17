@@ -5,9 +5,9 @@ import Badge from '../ui/Badge.vue';
 import Button from '../ui/Button.vue';
 import Input from '../ui/Input.vue';
 import PhoneNumber from './PhoneNumber.vue';
-import { analyzeSms } from '@/lib/sms';
-import { cn } from '@/lib/cn';
-import type { SmsAnalysis } from '@/lib/types';
+import { analyzeSms } from '../../lib/sms';
+import { cn } from '../../lib/cn';
+import type { SmsAnalysis } from '../../lib/types';
 
 const props = withDefaults(
   defineProps<{
@@ -81,6 +81,7 @@ function submit() {
 }
 
 function onKeydown(event: KeyboardEvent) {
+  if (event.isComposing) return;
   if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
     event.preventDefault();
     submit();
@@ -131,10 +132,11 @@ defineExpose({ analysis, submit });
       :disabled="disabled"
       :placeholder="placeholder"
       :aria-label="title"
+      aria-keyshortcuts="Control+Enter Meta+Enter"
       :class="
         cn(
           'block field-sizing-content max-h-64 min-h-28 w-full resize-none border-0 bg-transparent px-4 py-3 text-sm leading-relaxed outline-none',
-          'placeholder:text-sg-subtle-foreground disabled:cursor-not-allowed disabled:opacity-60',
+          'placeholder:text-sg-subtle-foreground focus-visible:ring-2 focus-visible:ring-sg-ring focus-visible:ring-inset disabled:cursor-not-allowed disabled:opacity-60',
         )
       "
       @keydown="onKeydown"
@@ -167,7 +169,7 @@ defineExpose({ analysis, submit });
             class="hidden rounded-sm border border-sg-border bg-sg-surface-muted px-1.5 py-0.5 font-sg-mono text-[0.625rem] text-sg-muted-foreground sm:inline-flex"
             aria-hidden="true"
           >
-            ⌘↵
+            Ctrl/⌘ ↵
           </kbd>
           <Button size="sm" :disabled="!canSend" :loading="sending" @click="submit">
             <SendHorizontal v-if="!sending" aria-hidden="true" />
@@ -186,9 +188,9 @@ defineExpose({ analysis, submit });
         />
       </div>
 
-      <p v-if="exceeds" class="mt-2 text-xs text-sg-danger">
-        This message needs more than {{ maxSegments }} segments. Shorten it or send it as two
-        messages.
+      <p v-if="exceeds" role="alert" class="mt-2 text-xs text-sg-danger">
+        This message needs more than {{ maxSegments }} segments. Shorten it or split it into
+        separate messages.
       </p>
     </div>
   </div>

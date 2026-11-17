@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { DialogTitle, type DialogTitleProps } from 'reka-ui';
-import { cn } from '@/lib/cn';
+import { cn } from '../../lib/cn';
 
 const props = defineProps<DialogTitleProps & { class?: string }>();
 </script>

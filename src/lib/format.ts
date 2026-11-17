@@ -73,7 +73,11 @@ export function formatRelativeTime(
   if (abs < 86_400) return relative.format(Math.round(diffSeconds / 3600), 'hour');
   if (abs < 7 * 86_400) return relative.format(Math.round(diffSeconds / 86_400), 'day');
 
-  return new Intl.DateTimeFormat(locale, { day: '2-digit', month: 'short' }).format(date);
+  return new Intl.DateTimeFormat(locale, {
+    day: '2-digit',
+    month: 'short',
+    year: date.getFullYear() === reference.getFullYear() ? undefined : 'numeric',
+  }).format(date);
 }
 
 /** Time of day, e.g. `14:32`. */

@@ -1,0 +1,6 @@
+/*
+ * Used by `pnpm example:build:dist`. The library stylesheet is already
+ * compiled, so this file only imports it; the example's own classes are
+ * scanned from this folder. No `@source` for the library is needed.
+ */
+@import '@mheers/sipgate-ui-components/style.css';

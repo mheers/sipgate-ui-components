@@ -13,7 +13,7 @@
 // ---------------------------------------------------------------------------
 export { default as Avatar } from './components/ui/Avatar.vue';
 export { default as Badge } from './components/ui/Badge.vue';
-export { default as Button, buttonVariants } from './components/ui/Button.vue';
+export { default as Button, buttonVariants, type ButtonVariants } from './components/ui/Button.vue';
 export { default as Card } from './components/ui/Card.vue';
 export { default as CardContent } from './components/ui/CardContent.vue';
 export { default as CardDescription } from './components/ui/CardDescription.vue';

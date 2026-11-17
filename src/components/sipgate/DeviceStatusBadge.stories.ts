@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Presence for an endpoint. The label always spells the state out — colour is a reinforcement, not the message.',
+          'Presence for an endpoint. The label always spells the state out — colour is a reinforcement, not the message. Set `showLabel` to `false` for a compact dot; the state stays available to screen readers.',
       },
     },
   },
@@ -44,6 +44,21 @@ export const AllStates: Story = {
         <DeviceStatusBadge status="busy" />
         <DeviceStatusBadge status="dnd" />
         <DeviceStatusBadge status="offline" />
+      </div>
+    `,
+  }),
+};
+
+export const DotOnly: Story = {
+  render: () => ({
+    components: { DeviceStatusBadge },
+    template: `
+      <div class="flex flex-wrap items-center gap-2">
+        <DeviceStatusBadge status="online" :show-label="false" />
+        <DeviceStatusBadge status="ringing" :show-label="false" />
+        <DeviceStatusBadge status="busy" :show-label="false" />
+        <DeviceStatusBadge status="dnd" :show-label="false" />
+        <DeviceStatusBadge status="offline" :show-label="false" />
       </div>
     `,
   }),

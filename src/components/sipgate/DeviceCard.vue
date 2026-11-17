@@ -4,8 +4,8 @@ import { Globe2, Headset, Phone, Radio, Smartphone } from 'lucide-vue-next';
 import Card from '../ui/Card.vue';
 import DeviceStatusBadge from './DeviceStatusBadge.vue';
 import PhoneNumber from './PhoneNumber.vue';
-import { cn } from '@/lib/cn';
-import type { Device } from '@/lib/types';
+import { cn } from '../../lib/cn';
+import type { Device } from '../../lib/types';
 
 const props = withDefaults(
   defineProps<{

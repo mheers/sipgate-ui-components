@@ -64,8 +64,9 @@ minimal scoped reset without touching the rest of your application:
 </div>
 ```
 
-Add `sg-dark` to the same element (or to `<html>`) for the dark theme. Components rendered in
-portals — dialogs and tooltips — carry their own scope.
+Add `sg-dark` to `<html>` for the dark theme, so dialogs and tooltips rendered in portals
+follow it too. A wrapper-level `sg-dark` still themes inline components, but portals render
+under `<body>` and only inherit a document-level theme.
 
 ## A first call
 
@@ -81,6 +82,7 @@ import {
 
 const muted = ref(false);
 const held = ref(false);
+const startedAt = new Date();
 const entries = ref<HistoryEntry[]>([]);
 </script>
 
@@ -88,7 +90,7 @@ const entries = ref<HistoryEntry[]>([]);
   <ActiveCallCard
     name="Anna de Vries"
     number="+49 151 23456789"
-    :started-at="new Date()"
+    :started-at="startedAt"
     :muted="muted"
     :recording="true"
     @toggle-mute="muted = !muted"
@@ -114,7 +116,7 @@ client stays the source of truth.
 | **Directory**     | `ContactListItem` · `DeviceCard` · `DeviceStatusBadge` · `AccountBalance` · `ConnectionStatus`                                                                                                         |
 | **Utilities**     | phone parsing and formatting · GSM-7/UCS-2 segment analysis · duration, date and currency formatting · initials and avatar tones · `useClipboard` · `useCallDuration`                                  |
 
-Every component has a Storybook page with props, states and accessibility notes.
+Every top-level component has a Storybook page with props, states and accessibility notes.
 
 ## Design principles
 
@@ -157,7 +159,7 @@ a realistic dashboard that exercises the whole library.
 ## Compatibility
 
 - Vue `^3.5`
-- Modern evergreen browsers; the CSS uses custom properties, `oklch` and `color-mix`
+- Modern evergreen browsers; the CSS uses custom properties and `color-mix`
 - Node `>= 20.19` for development only
 - No Tailwind installation required in the host app; the published `style.css` is compiled
 

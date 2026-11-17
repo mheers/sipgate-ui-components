@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import Badge from '../ui/Badge.vue';
-import type { CommunicationDirection, CommunicationType } from '@/lib/types';
+import type { CommunicationDirection, CommunicationType } from '../../lib/types';
 import { describeCommunication } from './communication';
 
 const props = withDefaults(

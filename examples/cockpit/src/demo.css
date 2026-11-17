@@ -1,8 +1,8 @@
 /*
- * The example consumes the library source through the package alias. Add the
- * source directory explicitly so Tailwind sees the classes inside the
- * components, even though the Vite root is this example folder.
+ * The example consumes the library through the package alias. In source mode
+ * that is `src/styles/index.css`; `SG_USE_DIST=1` switches it to the compiled
+ * `dist/style.css` so the release build exercises the published stylesheet.
  */
-@import '../../../src/styles/index.css';
+@import '@mheers/sipgate-ui-components/style.css';
 
 @source '../../../src';

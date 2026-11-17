@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { fn } from 'storybook/test';
 import VoicemailPlayer from './VoicemailPlayer.vue';
-import { voicemail } from '@/storybook/data';
+import { voicemail } from '../../storybook/data';
 
 const meta = {
   title: 'sipgate/VoicemailPlayer',

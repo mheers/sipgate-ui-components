@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import Badge from '../ui/Badge.vue';
-import type { DeviceStatus } from '@/lib/types';
+import { cn } from '../../lib/cn';
+import type { DeviceStatus } from '../../lib/types';
 
 const props = withDefaults(
   defineProps<{
@@ -25,7 +26,13 @@ const current = computed(() => meta[props.status]);
 </script>
 
 <template>
-  <Badge :variant="current.variant" :size="size" dot :class="props.class">
-    {{ current.label }}
+  <Badge
+    :variant="current.variant"
+    :size="size"
+    dot
+    :class="cn(!showLabel && 'gap-0 px-1.5', props.class)"
+  >
+    <span v-if="showLabel">{{ current.label }}</span>
+    <span v-else class="sr-only">{{ current.label }}</span>
   </Badge>
 </template>

@@ -29,10 +29,13 @@ export function useClipboard(options: UseClipboardOptions = {}) {
     textarea.style.opacity = '0';
     textarea.style.pointerEvents = 'none';
     document.body.appendChild(textarea);
-    textarea.select();
-    const ok = document.execCommand('copy');
-    document.body.removeChild(textarea);
-    if (!ok) throw new Error('Copy command failed');
+    try {
+      textarea.select();
+      const ok = document.execCommand('copy');
+      if (!ok) throw new Error('Copy command failed');
+    } finally {
+      textarea.remove();
+    }
   }
 
   async function copy(text: string): Promise<boolean> {

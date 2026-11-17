@@ -3,7 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 
 export const buttonVariants = cva(
   [
-    'inline-flex items-center justify-center gap-2 rounded-sg whitespace-nowrap select-none',
+    'relative inline-flex items-center justify-center gap-2 rounded-sg whitespace-nowrap select-none',
     'leading-none font-medium outline-none',
     'transition-[background-color,color,box-shadow,border-color,transform] duration-150 ease-out',
     'focus-visible:ring-2 focus-visible:ring-sg-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sg-background',
@@ -54,7 +54,7 @@ export type ButtonVariants = VariantProps<typeof buttonVariants>;
 <script setup lang="ts">
 import { computed } from 'vue';
 import { LoaderCircle } from 'lucide-vue-next';
-import { cn } from '@/lib/cn';
+import { cn } from '../../lib/cn';
 
 defineOptions({ inheritAttrs: false });
 
@@ -82,7 +82,7 @@ const isDisabled = computed(() => props.disabled || props.loading);
     :class="cn(buttonVariants({ variant, size, block }), $props.class)"
     v-bind="$attrs"
   >
-    <LoaderCircle v-if="loading" class="animate-sg-spin" aria-hidden="true" />
-    <slot />
+    <LoaderCircle v-if="loading" class="absolute animate-sg-spin" aria-hidden="true" />
+    <span :class="cn('inline-flex items-center gap-2', loading && 'opacity-0')"><slot /></span>
   </button>
 </template>

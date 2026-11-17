@@ -4,8 +4,8 @@ import { ChevronRight, Star } from 'lucide-vue-next';
 import Avatar from '../ui/Avatar.vue';
 import Badge from '../ui/Badge.vue';
 import PhoneNumber from './PhoneNumber.vue';
-import { cn } from '@/lib/cn';
-import type { Contact } from '@/lib/types';
+import { cn } from '../../lib/cn';
+import type { Contact } from '../../lib/types';
 
 const props = withDefaults(
   defineProps<{
@@ -53,7 +53,7 @@ const subtitle = computed(() => props.contact.company || props.contact.email || 
           <span class="truncate text-sm leading-tight font-medium text-sg-foreground">
             {{ contact.name }}
           </span>
-          <span v-if="contact.favorite" class="text-sg-warning" aria-hidden="true">
+          <span v-if="contact.favorite && !showFavorite" class="text-sg-warning" aria-hidden="true">
             <Star class="size-3.5 fill-current" />
           </span>
         </div>
@@ -97,7 +97,7 @@ const subtitle = computed(() => props.contact.company || props.contact.email || 
       :class="
         contact.favorite
           ? 'text-sg-warning'
-          : 'text-sg-subtle-foreground opacity-0 group-hover/contact:opacity-100 focus-visible:opacity-100'
+          : 'text-sg-subtle-foreground opacity-100 focus-visible:opacity-100 sm:opacity-0 sm:group-hover/contact:opacity-100'
       "
       :aria-pressed="contact.favorite || false"
       :aria-label="

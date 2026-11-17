@@ -4,9 +4,9 @@ import { Pause, Play } from 'lucide-vue-next';
 import Badge from '../ui/Badge.vue';
 import Card from '../ui/Card.vue';
 import PhoneNumber from './PhoneNumber.vue';
-import { cn } from '@/lib/cn';
-import { formatDuration, formatRelativeTime } from '@/lib/format';
-import type { DateInput } from '@/lib/format';
+import { cn } from '../../lib/cn';
+import { formatDuration, formatRelativeTime } from '../../lib/format';
+import type { DateInput } from '../../lib/format';
 
 const props = withDefaults(
   defineProps<{
@@ -71,7 +71,9 @@ function toggle() {
   const element = audio.value;
   if (!element || !props.src) return;
   if (element.paused) {
-    void element.play();
+    void element.play().catch(() => {
+      playing.value = false;
+    });
   } else {
     element.pause();
   }
@@ -104,6 +106,16 @@ watch(
     playing.value = false;
     currentTime.value = 0;
     duration.value = props.durationSeconds;
+  },
+);
+
+watch(
+  () => props.durationSeconds,
+  (value) => {
+    // Until the browser has read real metadata, trust the caller's duration.
+    if (!audio.value || !Number.isFinite(audio.value.duration) || audio.value.duration === 0) {
+      duration.value = value;
+    }
   },
 );
 </script>

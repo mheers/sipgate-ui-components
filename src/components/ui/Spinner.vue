@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { LoaderCircle } from 'lucide-vue-next';
-import { cn } from '@/lib/cn';
+import { cn } from '../../lib/cn';
 
 const props = withDefaults(
   defineProps<{

@@ -4,7 +4,7 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 # Theming
 
-The library ships a complete theme, but every value is a CSS custom property. You can
+The library ships a complete theme, but every theme choice is a CSS custom property. You can
 re-skin it per application — or per subtree — without rebuilding the package.
 
 ## How the layers fit together
@@ -71,7 +71,8 @@ operator-style product. Overrides are plain CSS, so they work with any build set
 
 ## Dark mode
 
-Dark mode is a token set, not a filter. Apply the class anywhere above the components:
+Dark mode is a token set, not a filter. Put the class on `<html>` so portalled dialogs
+and tooltips inherit it as well:
 
 ```html
 <html class="sg-dark">
@@ -83,8 +84,9 @@ Dark mode is a token set, not a filter. Apply the class anywhere above the compo
 
 `[data-sg-theme="dark"]` is also supported when you prefer attributes. Both toggle
 `color-scheme`, adjust every surface/border token and keep AA contrast for text and controls.
-The dark class belongs on `<html>` (or any ancestor); `.sg-root` inherits the active token set
-instead of forcing light values.
+A wrapper-level `sg-dark` still works for inline components, but portals render under `<body>`
+and only see a document-level theme. The dark class belongs on `<html>` for app-wide dark mode;
+`.sg-root` inherits the active token set instead of forcing light values.
 
 Here is the dark palette in brief:
 
@@ -137,8 +139,8 @@ preflight and does not define generic tokens, so it can sit beside your theme:
 
 The compiled `style.css` contains only the utilities the components use, prefixed classes and
 the scoped reset. Add `.sg-root` to a wrapper (or to `<body>` if the entire app is sipgate
-branded). Dialogs and tooltips render in a portal with their own `.sg-root` class, so they
-keep typography and the reset.
+branded). Dialogs and tooltips render in a portal with their own `.sg-root` class, so they keep
+typography and the reset; the dark theme must be on `<html>` for those portals to follow it.
 
 ## The reset, precisely
 
@@ -154,12 +156,13 @@ No margins, no heading sizes, no global `body` styles. Your application keeps it
 
 ## Tokens reference
 
-| Category | Tokens                                                                                                               |
-| -------- | -------------------------------------------------------------------------------------------------------------------- |
-| Surfaces | `background` · `surface` · `surface-muted` · `surface-inverse` · `inverse-foreground`                                |
-| Text     | `foreground` · `muted-foreground` · `subtle-foreground`                                                              |
-| Lines    | `border` · `border-strong` · `input`                                                                                 |
-| Brand    | `primary` · `primary-hover` · `primary-soft` · `primary-foreground` · `accent` · `accent-soft` · `accent-foreground` |
-| Signals  | `success` · `success-soft` · `warning` · `warning-soft` · `danger` · `danger-soft` · `info` · `info-soft`            |
-| Shape    | `radius-sm` · `radius` · `radius-lg` · `radius-xl`                                                                   |
-| Type     | `font-sans` · `font-display` · `font-mono`                                                                           |
+| Category | Tokens                                                                                                                                   |
+| -------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Surfaces | `background` · `surface` · `surface-muted` · `surface-inverse` · `inverse-foreground`                                                    |
+| Text     | `foreground` · `muted-foreground` · `subtle-foreground`                                                                                  |
+| Lines    | `border` · `border-strong` · `input`                                                                                                     |
+| Brand    | `primary` · `primary-hover` · `primary-soft` · `primary-foreground` · `accent` · `accent-soft` · `accent-foreground`                     |
+| Signals  | `success` · `success-soft` · `warning` · `warning-soft` · `danger` · `danger-soft` · `danger-foreground` · `info` · `info-soft` · `ring` |
+| Shape    | `radius-sm` · `radius` · `radius-lg` · `radius-xl`                                                                                       |
+| Type     | `font-sans` · `font-display` · `font-mono`                                                                                               |
+| Depth    | `shadow-xs` · `shadow-sm` · `shadow-md` · `shadow-lg`                                                                                    |

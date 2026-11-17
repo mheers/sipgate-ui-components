@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite';
 import { describeCommunication } from './communication';
 import CommunicationBadge from './CommunicationBadge.vue';
 import CommunicationIcon from './CommunicationIcon.vue';
-import type { CommunicationDirection, CommunicationType } from '@/lib/types';
+import type { CommunicationDirection, CommunicationType } from '../../lib/types';
 
 const entries: Array<{ type: CommunicationType; direction: CommunicationDirection }> = [
   { type: 'call', direction: 'inbound' },
