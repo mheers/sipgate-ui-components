@@ -30,6 +30,7 @@ const preview: Preview = {
       themes: {
         light: '',
         dark: 'sg-dark',
+        'shadcn dark': 'dark',
       },
       defaultTheme: 'light',
     }),

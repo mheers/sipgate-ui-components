@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   formatCurrency,
   formatDateTime,
+  formatDateTimeLong,
   formatDayHeading,
   formatDuration,
   formatDurationWords,
@@ -65,6 +66,7 @@ describe('dates', () => {
     const local = new Date(2026, 10, 17, 14, 32);
     expect(formatTime(local, 'en-GB')).toBe('14:32');
     expect(formatDateTime(local, 'en-GB')).toMatch(/17/);
+    expect(formatDateTimeLong(local, 'en-GB')).toMatch(/17 Nov 2026/);
   });
 
   it('returns empty strings for invalid dates', () => {

@@ -111,6 +111,9 @@ const ZERO_TRUNK_CODES = new Set([
   '90',
 ]);
 
+/** Reused per size instead of rebuilding the same RegExp for every number. */
+const chunkPatterns = new Map<number, RegExp>();
+
 /**
  * German area codes, with the big city codes first so `030`, `040`, `069`
  * and `089` always win over longer prefixes. The list is a display heuristic,
@@ -375,7 +378,12 @@ function chunk(value: string, sizes: number[]): string[] {
 }
 
 function chunkEvery(value: string, size: number): string[] {
-  return value.match(new RegExp(`.{1,${size}}`, 'g')) ?? [];
+  let pattern = chunkPatterns.get(size);
+  if (!pattern) {
+    pattern = new RegExp(`.{1,${size}}`, 'g');
+    chunkPatterns.set(size, pattern);
+  }
+  return value.match(pattern) ?? [];
 }
 
 /** Split a long subscriber number into two readable halves. */

@@ -82,11 +82,12 @@ and tooltips inherit it as well:
 </html>
 ```
 
-`[data-sg-theme="dark"]` is also supported when you prefer attributes. Both toggle
-`color-scheme`, adjust every surface/border token and keep AA contrast for text and controls.
-A wrapper-level `sg-dark` still works for inline components, but portals render under `<body>`
-and only see a document-level theme. The dark class belongs on `<html>` for app-wide dark mode;
-`.sg-root` inherits the active token set instead of forcing light values.
+`[data-sg-theme="dark"]` is also supported when you prefer attributes, and shadcn's `.dark`
+class is recognised as well — a shadcn app needs no extra class synchronisation. All three
+toggle `color-scheme`, adjust every surface/border token and keep AA contrast for text and
+controls. A wrapper-level class still works for inline components, but portals render under
+`<body>` and only see a document-level theme. The dark class belongs on `<html>` for app-wide
+dark mode; `.sg-root` inherits the active token set instead of forcing light values.
 
 Here is the dark palette in brief:
 
@@ -141,6 +142,8 @@ The compiled `style.css` contains only the utilities the components use, prefixe
 the scoped reset. Add `.sg-root` to a wrapper (or to `<body>` if the entire app is sipgate
 branded). Dialogs and tooltips render in a portal with their own `.sg-root` class, so they keep
 typography and the reset; the dark theme must be on `<html>` for those portals to follow it.
+Continue with **Foundations → Using with shadcn** for the complete token bridge and load-order
+advice.
 
 ## The reset, precisely
 

@@ -5,7 +5,13 @@ import CommunicationIcon from './CommunicationIcon.vue';
 import PhoneNumber from './PhoneNumber.vue';
 import { describeCommunication } from './communication';
 import { cn } from '../../lib/cn';
-import { formatDuration, formatRelativeTime, formatTime, toDate } from '../../lib/format';
+import {
+  formatDateTimeLong,
+  formatDuration,
+  formatRelativeTime,
+  formatTime,
+  toDate,
+} from '../../lib/format';
 import { formatPhoneNumber } from '../../lib/phone';
 import type { HistoryEntry } from '../../lib/types';
 
@@ -41,14 +47,7 @@ const timeLabel = computed(() =>
     ? formatRelativeTime(props.entry.startedAt, { locale: props.locale })
     : formatTime(props.entry.startedAt, props.locale),
 );
-const fullDate = computed(() => {
-  const date = toDate(props.entry.startedAt);
-  if (!date) return '';
-  return new Intl.DateTimeFormat(props.locale, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(date);
-});
+const fullDate = computed(() => formatDateTimeLong(props.entry.startedAt, props.locale));
 const detail = computed(() => {
   const parts: string[] = [descriptor.value.label];
   if (props.entry.outcome && ['busy', 'failed', 'rejected'].includes(props.entry.outcome)) {

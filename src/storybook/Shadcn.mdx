@@ -1,0 +1,208 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Using with shadcn" />
+
+# Using with shadcn
+
+This library is designed to sit inside an existing shadcn app, not replace it. It uses the
+same ideas — reka-ui primitives, `class-variance-authority`, a `cn()` helper and Tailwind —
+but every visual token is prefixed with `sg`, and the reset only applies inside `.sg-root`.
+
+## 1. Load order
+
+Import the library stylesheet **before** your Tailwind entry:
+
+```ts
+// main.ts
+import '@mheers/sipgate-ui-components/style.css';
+import './assets/index.css'; // your shadcn + Tailwind entry
+```
+
+The published stylesheet contains the default-scale Tailwind utilities its components use.
+Loading your Tailwind entry afterwards keeps your theme authoritative for shared class names
+and custom spacing/type scales. The `sg-*` classes are unique to this library either way.
+
+If you prefer CSS imports, keep the same order:
+
+```css
+@import '@mheers/sipgate-ui-components/style.css';
+@import './index.css';
+```
+
+## 2. Scope the components
+
+```vue
+<template>
+  <div class="sg-root">
+    <ActiveCallCard number="+49 30 12345678" />
+  </div>
+</template>
+```
+
+The reset only touches `.sg-root` and its descendants. Dialogs and tooltips are portalled
+with their own `.sg-root` class, so they keep the reset and the font stack.
+
+## 3. Bridge the tokens
+
+Add this after both stylesheets. Keep it **unlayered** — for example, not inside
+`@layer base` — so it wins over the library's default `--sg-*` tokens. It maps shadcn's
+semantic tokens onto the library's `sg` tokens while leaving the lime accent and the library's
+signal colours alone.
+
+```css
+.sg-root {
+  /* Surfaces */
+  --sg-background: var(--background);
+  --sg-surface: var(--card);
+  --sg-surface-muted: var(--muted);
+  --sg-surface-inverse: var(--foreground);
+  --sg-inverse-foreground: var(--background);
+  --sg-foreground: var(--foreground);
+  /* Nudged toward the foreground so 11px badges keep AA on --muted. */
+  --sg-muted-foreground: color-mix(in oklab, var(--muted-foreground) 82%, var(--foreground));
+  --sg-subtle-foreground: color-mix(in oklab, var(--muted-foreground) 82%, var(--foreground));
+
+  /* Lines — shadcn's --input is a border colour, not an input surface */
+  --sg-border: var(--border);
+  --sg-border-strong: var(--input);
+  --sg-input: var(--background);
+
+  /* Action */
+  --sg-primary: var(--primary);
+  --sg-primary-foreground: var(--primary-foreground);
+  --sg-primary-hover: color-mix(in oklab, var(--primary) 88%, var(--foreground));
+  --sg-primary-soft: color-mix(in oklab, var(--primary) 12%, var(--background));
+  --sg-primary-strong: color-mix(in oklab, var(--primary) 82%, var(--foreground));
+  --sg-ring: var(--ring);
+  --sg-danger: var(--destructive, #c42518);
+  --sg-danger-foreground: var(--destructive-foreground, #fff);
+  --sg-danger-soft: color-mix(in oklab, var(--destructive, #c42518) 12%, var(--background));
+
+  /* Shape */
+  --sg-radius-sm: calc(var(--radius, 0.625rem) - 4px);
+  --sg-radius: var(--radius, 0.625rem);
+  --sg-radius-lg: calc(var(--radius, 0.625rem) + 4px);
+  --sg-radius-xl: calc(var(--radius, 0.625rem) + 8px);
+
+  /* Type — remove these three lines to keep Instrument Sans / Bricolage / JetBrains Mono */
+  --sg-font-sans: var(
+    --font-sans,
+    'Instrument Sans Variable',
+    ui-sans-serif,
+    system-ui,
+    sans-serif
+  );
+  --sg-font-display: var(
+    --font-heading,
+    var(--font-sans, 'Instrument Sans Variable', ui-sans-serif, system-ui, sans-serif)
+  );
+  --sg-font-mono: var(--font-mono, 'JetBrains Mono Variable', ui-monospace, monospace);
+}
+```
+
+### Why these mappings
+
+| shadcn token   | library token             | Why                                                                 |
+| -------------- | ------------------------- | ------------------------------------------------------------------- |
+| `--background` | `--sg-background`         | page surface                                                        |
+| `--card`       | `--sg-surface`            | cards, dialogs, composer                                            |
+| `--muted`      | `--sg-surface-muted`      | quiet surfaces, empty states                                        |
+| `--foreground` | `--sg-surface-inverse`    | the ink call/balance card is the inverse of the page                |
+| `--background` | `--sg-inverse-foreground` | text on the inverse surface                                         |
+| `--border`     | `--sg-border`             | ordinary hairlines                                                  |
+| `--input`      | `--sg-border-strong`      | shadcn's input token is a border colour; the library's input border |
+| `--background` | `--sg-input`              | the actual input background                                         |
+| `--primary`    | `--sg-primary`            | primary actions                                                     |
+| `--ring`       | `--sg-ring`               | focus rings                                                         |
+| `--radius`     | `--sg-radius*`            | shadcn's radius base drives all four library radii                  |
+
+`--sg-accent` is intentionally not mapped. It is the acid-lime signal used for live audio,
+answer actions and recording — mapping it to shadcn's `--accent` (a neutral hover surface)
+would erase that meaning. The same applies to `--sg-success`, `--sg-warning` and `--sg-info`.
+
+## 4. Dark mode
+
+The library recognises all three dark selectors:
+
+- `.sg-dark` — the library's own class
+- `.dark` — shadcn's class
+- `[data-sg-theme="dark"]` — attribute form
+
+So a shadcn app needs no extra class synchronisation. Put the dark class on `<html>` so
+portalled dialogs and tooltips inherit it too. A wrapper-level class still themes inline
+components, but portals render under `<body>` and only see document-level tokens.
+
+```html
+<html class="dark">
+  <body>
+    <div class="sg-root"><!-- library components --></div>
+  </body>
+</html>
+```
+
+Both token sets are complete: surfaces, borders, text, primary, accent, signals, radii and
+shadows. Override any of them inside `.sg-root` as usual.
+
+## 5. A complete screen
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue';
+import { ActiveCallCard, Button, SmsComposer } from '@mheers/sipgate-ui-components';
+
+const message = ref('');
+const recipient = ref('+4915123456789');
+const startedAt = new Date();
+</script>
+
+<template>
+  <div class="sg-root min-h-dvh bg-sg-background p-6 text-sg-foreground">
+    <ActiveCallCard name="Anna de Vries" number="+49 151 23456789" :started-at="startedAt" />
+
+    <SmsComposer v-model="message" v-model:recipient="recipient" class="mt-4" />
+
+    <Button class="mt-4" variant="outline">Open in sipgate</Button>
+  </div>
+</template>
+```
+
+The `min-h-dvh bg-sg-background text-sg-foreground` classes make the wrapper fill the page and
+use the bridged shadcn surface tokens. Inside a shadcn page you can also let the host control
+the page background and omit those classes.
+
+## Bundle size and performance
+
+The package is ESM-only and side-effect free except for CSS, so named imports tree-shake. The
+numbers below are Vite 8 production builds, minified and gzipped, **with Vue included**:
+
+| Import                              | Total  | Incremental over bare Vue |
+| ----------------------------------- | ------ | ------------------------- |
+| Bare Vue app                        | ~26 KB | —                         |
+| `Button` only                       | ~37 KB | ~11 KB                    |
+| Dashboard subset                    | ~67 KB | ~41 KB                    |
+| Every component                     | ~90 KB | ~64 KB                    |
+| `style.css` (all component classes) | ~8 KB  | one-time                  |
+
+- Shared dependencies — Vue, reka-ui, lucide-vue-next, `cva`, `clsx`, `tailwind-merge` — are
+  externalized and dedupe with compatible copies in your shadcn app.
+- The library adds no global theme layer and no runtime CSS-in-JS. The stylesheet is the only
+  mandatory side effect.
+- Import components by name. A namespace import (`import * as lib`) defeats tree-shaking in
+  some bundlers.
+- Fonts are never bundled. Add only the faces your shell already uses.
+- Formatting helpers cache their `Intl` formatters, so long history and thread lists do not
+  rebuild formatters per row.
+
+## What stays separate
+
+- **CSS variables** — no `--background`, `--primary`, `--spacing` or other generic variables
+  are emitted by the library. Your shadcn theme is untouched.
+- **The reset** — scoped to `.sg-root`; no body, heading or margin resets leak out.
+- **Class names** — component styling uses `sg-*` tokens and `rounded-sg*`, `shadow-sg*`,
+  `font-sg-*`; there is no collision with shadcn utilities.
+- **Primitives** — the library keeps its own `Button`, `Input`, `Dialog`, etc. Both component
+  sets can be used on the same page.
+
+The reverse is not automatic: shadcn components rendered inside `.sg-root` will inherit the
+library's font stack and the scoped reset. Put shadcn components outside `.sg-root`, or set the
+font tokens as shown above.

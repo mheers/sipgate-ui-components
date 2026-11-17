@@ -65,8 +65,9 @@ minimal scoped reset without touching the rest of your application:
 ```
 
 Add `sg-dark` to `<html>` for the dark theme, so dialogs and tooltips rendered in portals
-follow it too. A wrapper-level `sg-dark` still themes inline components, but portals render
-under `<body>` and only inherit a document-level theme.
+follow it too. shadcn's `.dark` class is recognised as an alias, so an existing shadcn app
+needs no synchronisation. A wrapper-level class still themes inline components, but portals
+render under `<body>` and only inherit a document-level theme.
 
 ## A first call
 

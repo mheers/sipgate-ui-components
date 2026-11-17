@@ -4,6 +4,22 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- shadcn interop: the library now follows shadcn's document-level `.dark` class in
+  addition to `.sg-dark` and `[data-sg-theme="dark"]`.
+- A **Foundations → Using with shadcn** guide with load-order advice, a complete
+  token bridge, and the mappings that should stay library-specific.
+
+### Changed
+
+- Formatting helpers memoize `Intl` formatters instead of constructing them per
+  history row or message, and the phone formatter reuses its chunk patterns.
+- The README and Storybook integration guide document measured tree-shaken bundle
+  sizes and named-import guidance.
+
 ## [0.1.0] — 2026-11-17
 
 The first public foundation.

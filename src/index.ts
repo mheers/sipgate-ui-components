@@ -92,6 +92,7 @@ export { cn } from './lib/cn';
 export {
   formatCurrency,
   formatDateTime,
+  formatDateTimeLong,
   formatDayHeading,
   formatDuration,
   formatDurationWords,

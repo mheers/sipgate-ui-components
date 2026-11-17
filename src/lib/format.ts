@@ -1,5 +1,39 @@
 export type DateInput = string | number | Date | null | undefined;
 
+/**
+ * `Intl` formatters are relatively expensive to construct and the history,
+ * thread and balance components format many rows. Keep one formatter per
+ * locale/options combination instead of rebuilding it for every row.
+ */
+const relativeTimeFormats = new Map<string, Intl.RelativeTimeFormat>();
+const dateFormats = new Map<string, Intl.DateTimeFormat>();
+const currencyFormats = new Map<string, Intl.NumberFormat>();
+const unitFormats = new Map<string, Intl.NumberFormat>();
+
+function cached<T>(cache: Map<string, T>, key: string, create: () => T): T {
+  const existing = cache.get(key);
+  if (existing) return existing;
+  const created = create();
+  cache.set(key, created);
+  return created;
+}
+
+function relativeTimeFormat(locale: string): Intl.RelativeTimeFormat {
+  return cached(
+    relativeTimeFormats,
+    locale,
+    () => new Intl.RelativeTimeFormat(locale, { numeric: 'auto' }),
+  );
+}
+
+function dateFormat(locale: string, options: Intl.DateTimeFormatOptions): Intl.DateTimeFormat {
+  return cached(
+    dateFormats,
+    `${locale}|${JSON.stringify(options)}`,
+    () => new Intl.DateTimeFormat(locale, options),
+  );
+}
+
 /** Convert anything date-ish into a Date, or `null` when invalid. */
 export function toDate(value: DateInput): Date | null {
   if (value === null || value === undefined || value === '') return null;
@@ -31,12 +65,17 @@ export function formatDurationWords(totalSeconds: number, locale = 'en'): string
   const seconds = safe % 60;
 
   const unit = (value: number, name: 'hour' | 'minute' | 'second') =>
-    new Intl.NumberFormat(locale, {
-      style: 'unit',
-      unit: name,
-      unitDisplay: 'short',
-      maximumFractionDigits: 0,
-    }).format(value);
+    cached(
+      unitFormats,
+      `${locale}|${name}`,
+      () =>
+        new Intl.NumberFormat(locale, {
+          style: 'unit',
+          unit: name,
+          unitDisplay: 'short',
+          maximumFractionDigits: 0,
+        }),
+    ).format(value);
 
   if (hours > 0) {
     return [unit(hours, 'hour'), minutes > 0 ? unit(minutes, 'minute') : '']
@@ -66,14 +105,14 @@ export function formatRelativeTime(
   const diffSeconds = Math.round((date.getTime() - reference.getTime()) / 1000);
   const abs = Math.abs(diffSeconds);
 
-  const relative = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
+  const relative = relativeTimeFormat(locale);
 
   if (abs < 45) return relative.format(0, 'second');
   if (abs < 3600) return relative.format(Math.round(diffSeconds / 60), 'minute');
   if (abs < 86_400) return relative.format(Math.round(diffSeconds / 3600), 'hour');
   if (abs < 7 * 86_400) return relative.format(Math.round(diffSeconds / 86_400), 'day');
 
-  return new Intl.DateTimeFormat(locale, {
+  return dateFormat(locale, {
     day: '2-digit',
     month: 'short',
     year: date.getFullYear() === reference.getFullYear() ? undefined : 'numeric',
@@ -84,7 +123,7 @@ export function formatRelativeTime(
 export function formatTime(value: DateInput, locale = 'en-GB'): string {
   const date = toDate(value);
   if (!date) return '';
-  return new Intl.DateTimeFormat(locale, {
+  return dateFormat(locale, {
     hour: '2-digit',
     minute: '2-digit',
   }).format(date);
@@ -94,12 +133,19 @@ export function formatTime(value: DateInput, locale = 'en-GB'): string {
 export function formatDateTime(value: DateInput, locale = 'en-GB'): string {
   const date = toDate(value);
   if (!date) return '';
-  return new Intl.DateTimeFormat(locale, {
+  return dateFormat(locale, {
     day: '2-digit',
     month: 'short',
     hour: '2-digit',
     minute: '2-digit',
   }).format(date);
+}
+
+/** Full date and time for titles, e.g. `17 Nov 2026, 14:32`. */
+export function formatDateTimeLong(value: DateInput, locale = 'en-GB'): string {
+  const date = toDate(value);
+  if (!date) return '';
+  return dateFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(date);
 }
 
 /** Day heading for grouped lists: `Today`, `Yesterday`, or `12 Nov 2025`. */
@@ -116,12 +162,12 @@ export function formatDayHeading(
     new Date(input.getFullYear(), input.getMonth(), input.getDate()).getTime();
   const dayDiff = Math.round((startOf(reference) - startOf(date)) / 86_400_000);
 
-  const relative = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
+  const relative = relativeTimeFormat(locale);
   const capitalise = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
   if (dayDiff === 0) return capitalise(relative.format(0, 'day'));
   if (dayDiff === 1) return capitalise(relative.format(-1, 'day'));
 
-  return new Intl.DateTimeFormat(locale, {
+  return dateFormat(locale, {
     day: '2-digit',
     month: 'short',
     year: date.getFullYear() === reference.getFullYear() ? undefined : 'numeric',
@@ -131,10 +177,15 @@ export function formatDayHeading(
 /** Currency from a decimal amount, e.g. `12.5` → `€12.50`. */
 export function formatCurrency(amount: number, currency = 'EUR', locale = 'de-DE'): string {
   if (!Number.isFinite(amount)) return '';
-  return new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency,
-  }).format(amount);
+  return cached(
+    currencyFormats,
+    `${locale}|${currency}`,
+    () =>
+      new Intl.NumberFormat(locale, {
+        style: 'currency',
+        currency,
+      }),
+  ).format(amount);
 }
 
 /**

@@ -4,7 +4,8 @@
  * Everything is namespaced with `sg` so the library can live next to an
  * existing shadcn/Tailwind theme without fighting over `--primary` or
  * `--background`. Tokens are emitted on :root (so teleported overlays work)
- * and can be overridden per subtree with `.sg-root` / `.sg-dark`.
+ * and can be overridden per subtree with `.sg-root`, `.sg-dark` or shadcn's
+ * document-level `.dark`.
  */
 
 @layer base, components, utilities;
@@ -24,7 +25,7 @@
  * `utilities` and every `bg-sg-*` on a button loses to `background: transparent`.
  */
 
-@custom-variant sg-dark (&:where(.sg-dark, .sg-dark *, [data-sg-theme='dark'], [data-sg-theme='dark'] *));
+@custom-variant sg-dark (&:where(.sg-dark, .sg-dark *, .dark, .dark *, [data-sg-theme='dark'], [data-sg-theme='dark'] *));
 
 :root {
   /* ---- Surfaces ------------------------------------------------------- */
@@ -89,6 +90,7 @@
 }
 
 .sg-dark,
+.dark,
 [data-sg-theme='dark'] {
   --sg-background: #141118;
   --sg-surface: #1c1823;
@@ -318,8 +320,9 @@
     color-scheme: light;
   }
 
-  .sg-root:is(.sg-dark, [data-sg-theme='dark']),
+  .sg-root:is(.sg-dark, .dark, [data-sg-theme='dark']),
   .sg-dark .sg-root,
+  .dark .sg-root,
   [data-sg-theme='dark'] .sg-root {
     color-scheme: dark;
   }

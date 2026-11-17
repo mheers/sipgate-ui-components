@@ -115,8 +115,9 @@ function sendSms(payload: { message: string; recipient: string }) {
 ```
 
 Add `sg-dark` to `<html>` for the dark theme, so dialogs and tooltips rendered in a portal
-inherit it too. A wrapper-level `sg-dark` still themes inline components, but portalled
-overlays live under `<body>` and only see the document-level theme:
+inherit it too. If the app already uses shadcn, no extra class is needed: the library also
+recognises shadcn's `.dark` class on `<html>`. A wrapper-level class still themes inline
+components, but portalled overlays live under `<body>` and only see the document-level theme:
 
 ```html
 <html class="sg-dark">
@@ -186,20 +187,20 @@ with their parent.
 
 ### Composables and utilities
 
-| Export                                                           | What it does                                                             |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| [`useCallDuration`](./src/composables/useCallDuration.ts)        | Reactive seconds since call start; SSR-safe and tick cleanup.            |
-| [`useClipboard`](./src/composables/useClipboard.ts)              | Clipboard API with a legacy fallback and transient `copied` state.       |
-| [`formatPhoneNumber`](./src/lib/phone.ts)                        | German area-code intelligence, mobile prefixes, international fallbacks. |
-| [`parsePhoneNumber`](./src/lib/phone.ts)                         | E.164 parsing from `+49`, `0049`, national and messy input.              |
-| [`telHref`](./src/lib/phone.ts)                                  | Safe `tel:` links.                                                       |
-| [`analyzeSms`](./src/lib/sms.ts)                                 | GSM-7 vs UCS-2, septet counting, billable segments.                      |
-| [`formatDuration` / `formatDurationWords`](./src/lib/format.ts)  | Clock (`1:02:05`) and localised human durations.                         |
-| [`formatRelativeTime` / `formatDayHeading`](./src/lib/format.ts) | “5 minutes ago”, “Today”, “Yesterday”.                                   |
-| [`formatCurrency`](./src/lib/format.ts)                          | Locale-aware money for account credit.                                   |
-| [`getInitials`](./src/lib/format.ts)                             | Deterministic initials from names, emails and single words.              |
-| [`avatarTone`](./src/lib/avatar.ts)                              | Stable, AA-contrast avatar colours derived from a name.                  |
-| [`cn`](./src/lib/cn.ts)                                          | `clsx` + `tailwind-merge` helper used by every component.                |
+| Export                                                                                  | What it does                                                             |
+| --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| [`useCallDuration`](./src/composables/useCallDuration.ts)                               | Reactive seconds since call start; SSR-safe and tick cleanup.            |
+| [`useClipboard`](./src/composables/useClipboard.ts)                                     | Clipboard API with a legacy fallback and transient `copied` state.       |
+| [`formatPhoneNumber`](./src/lib/phone.ts)                                               | German area-code intelligence, mobile prefixes, international fallbacks. |
+| [`parsePhoneNumber`](./src/lib/phone.ts)                                                | E.164 parsing from `+49`, `0049`, national and messy input.              |
+| [`telHref`](./src/lib/phone.ts)                                                         | Safe `tel:` links.                                                       |
+| [`analyzeSms`](./src/lib/sms.ts)                                                        | GSM-7 vs UCS-2, septet counting, billable segments.                      |
+| [`formatDuration` / `formatDurationWords`](./src/lib/format.ts)                         | Clock (`1:02:05`) and localised human durations.                         |
+| [`formatRelativeTime` / `formatDayHeading` / `formatDateTimeLong`](./src/lib/format.ts) | “5 minutes ago”, “Today”, “Yesterday”, full title dates.                 |
+| [`formatCurrency`](./src/lib/format.ts)                                                 | Locale-aware money for account credit.                                   |
+| [`getInitials`](./src/lib/format.ts)                                                    | Deterministic initials from names, emails and single words.              |
+| [`avatarTone`](./src/lib/avatar.ts)                                                     | Stable, AA-contrast avatar colours derived from a name.                  |
+| [`cn`](./src/lib/cn.ts)                                                                 | `clsx` + `tailwind-merge` helper used by every component.                |
 
 ## The details that matter
 
@@ -283,6 +284,105 @@ Tokens are prefixed on purpose. A shadcn app can borrow its own brand without a 
   --sg-border: var(--border);
 }
 ```
+
+### Using it inside a shadcn app
+
+The library is built for coexistence, not replacement: prefixed `--sg-*` tokens, a reset scoped
+to `.sg-root`, and primitives built on the same reka-ui + cva foundation as shadcn-vue.
+
+Three details make it seamless:
+
+1. **Load order.** Import the library stylesheet before your Tailwind entry so your theme stays
+   authoritative for shared utility names:
+
+   ```ts
+   // main.ts
+   import '@mheers/sipgate-ui-components/style.css';
+   import './assets/index.css'; // shadcn + Tailwind
+   ```
+
+2. **Render the library inside `.sg-root`.**
+
+3. **Bridge the tokens.** Put this after both stylesheets, unlayered, so it wins over the
+   library defaults:
+
+   ```css
+   .sg-root {
+     /* Surfaces */
+     --sg-background: var(--background);
+     --sg-surface: var(--card);
+     --sg-surface-muted: var(--muted);
+     --sg-surface-inverse: var(--foreground);
+     --sg-inverse-foreground: var(--background);
+     --sg-foreground: var(--foreground);
+     /* Nudged toward the foreground so 11px badges keep AA on --muted. */
+     --sg-muted-foreground: color-mix(in oklab, var(--muted-foreground) 82%, var(--foreground));
+     --sg-subtle-foreground: color-mix(in oklab, var(--muted-foreground) 82%, var(--foreground));
+
+     /* Lines — note that shadcn's --input is a border, not an input surface */
+     --sg-border: var(--border);
+     --sg-border-strong: var(--input);
+     --sg-input: var(--background);
+
+     /* Action */
+     --sg-primary: var(--primary);
+     --sg-primary-foreground: var(--primary-foreground);
+     --sg-primary-hover: color-mix(in oklab, var(--primary) 88%, var(--foreground));
+     --sg-primary-soft: color-mix(in oklab, var(--primary) 12%, var(--background));
+     --sg-primary-strong: color-mix(in oklab, var(--primary) 82%, var(--foreground));
+     --sg-ring: var(--ring);
+     --sg-danger: var(--destructive, #c42518);
+     --sg-danger-foreground: var(--destructive-foreground, #fff);
+     --sg-danger-soft: color-mix(in oklab, var(--destructive, #c42518) 12%, var(--background));
+
+     /* Shape */
+     --sg-radius-sm: calc(var(--radius, 0.625rem) - 4px);
+     --sg-radius: var(--radius, 0.625rem);
+     --sg-radius-lg: calc(var(--radius, 0.625rem) + 4px);
+     --sg-radius-xl: calc(var(--radius, 0.625rem) + 8px);
+
+     /* Type — omit to keep Instrument Sans / Bricolage / JetBrains Mono */
+     --sg-font-sans: var(
+       --font-sans,
+       'Instrument Sans Variable',
+       ui-sans-serif,
+       system-ui,
+       sans-serif
+     );
+     --sg-font-display: var(
+       --font-heading,
+       var(--font-sans, 'Instrument Sans Variable', ui-sans-serif, system-ui, sans-serif)
+     );
+     --sg-font-mono: var(--font-mono, 'JetBrains Mono Variable', ui-monospace, monospace);
+   }
+   ```
+
+The library also recognises shadcn's `.dark` class on `<html>`, alongside `.sg-dark` and
+`[data-sg-theme="dark"]`. No class syncing is needed for dark mode. Keep the dark class on
+`<html>` so portalled dialogs and tooltips inherit it too.
+
+Deliberately **not** mapped: `--sg-accent` (the acid-lime live-audio signal) and the
+success/warning/info semaphores. Map those only if your product defines equivalents. The full
+integration page, including what each bridge token affects, lives in
+**Storybook → Foundations → Using with shadcn**.
+
+### Bundle size
+
+The package is ESM-only and marked side-effect free except for CSS, so named imports
+tree-shake. Measured with Vite 8, minified and gzipped, **including Vue**:
+
+| Import                                         | Total  | Incremental over bare Vue |
+| ---------------------------------------------- | ------ | ------------------------- |
+| Bare Vue app                                   | ~26 KB | —                         |
+| `Button` only                                  | ~37 KB | ~11 KB                    |
+| Dashboard subset (history, SMS, dialog, cards) | ~67 KB | ~41 KB                    |
+| Every component                                | ~90 KB | ~64 KB                    |
+| Published stylesheet                           | ~8 KB  | one-time                  |
+
+A `Button`-only bundle contains no unused reka-ui primitives or lucide icons. In a shadcn app
+the shared building blocks — Vue, reka-ui, lucide-vue-next, `cva`, `clsx`, `tailwind-merge` —
+are already present and compatible copies dedupe. Import the components you render, not the
+whole namespace. Fonts are not bundled, and there is no runtime Tailwind dependency.
 
 ### Fonts
 
