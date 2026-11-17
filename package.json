@@ -1,6 +1,6 @@
 {
   "name": "@mheers/sipgate-ui-components",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A considered Vue 3 component library for building sipgate applications — calls, messages, contacts, devices and numbers.",
   "keywords": [
     "sipgate",
