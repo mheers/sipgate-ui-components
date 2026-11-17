@@ -19,7 +19,7 @@ defaults, and the telephony details generic UI kits always miss.
 
 </details>
 
-> **Status:** `0.1.1`, pre-1.0. Component APIs are stable enough to build on, but minor
+> **Status:** `0.2.0`, pre-1.0. Component APIs are stable enough to build on, but minor
 > releases may still adjust props. Every change is documented in the
 > [changelog](./CHANGELOG.md).
 
@@ -133,7 +133,7 @@ To work against a local checkout:
 pnpm install && pnpm build
 pnpm pack
 # in your app
-pnpm add ../sipgate-ui-components/mheers-sipgate-ui-components-0.1.1.tgz
+pnpm add ../sipgate-ui-components/mheers-sipgate-ui-components-0.2.0.tgz
 ```
 
 ## Components
